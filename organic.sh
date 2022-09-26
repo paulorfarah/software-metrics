@@ -22,4 +22,4 @@ git checkout $commit
 cd ..
 /bin/sh organic-v0.1.0/bin/organic -sf organic-results/"${PROJECT_NAME}"/"${PROJECT_NAME}"_"${commit}"_organic.json -src "$PWD"/"${PROJECT_NAME}" 
 done < $filename
-
+rm -Rf "${PROJECT_NAME}"
