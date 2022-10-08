@@ -230,8 +230,8 @@ def join_static_features():
     #                                              right_on=['project_name', 'commit_hash', 'File'], how='outer'),
     #                 [df_ck, df_und])
 
-    df_all = pd.merge(left=df_ck, right=df_und, left_on=['project_name', 'commit_hash', 'class'],
-                                                 right_on=['project_name', 'commit_hash', 'File'], how='outer')
+    df_all = pd.merge(left=df_ck, right=df_und, left_on=['project_name'], #, 'commit_hash', 'class'
+                                                 right_on=['project_name'], how='outer') #, 'commit_hash', 'File'
     df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 
