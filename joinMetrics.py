@@ -160,7 +160,7 @@ def join_all_metrics():
     # print("CK ")
     # print(ck_values.shape[0])
 
-    understand_metrics = ["Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
+    und_metrics = ["Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
                           "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
                           "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
                           "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
@@ -174,7 +174,8 @@ def join_all_metrics():
                           "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
                           "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash', 'project_name']
     und_values = pd.read_csv('results/understand/und_all.csv', index_col=[1, 2, 3, 4, 5, 6], sep=',',
-                             engine='python')
+                             engine='python', names=und_metrics)
+    print(und_values.head(1))
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
@@ -217,7 +218,7 @@ def join_all_metrics():
     # all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
     df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'],  #
                                                                    right_on=['project_name', 'commit_hash', 'File'], how='outer') #, 'commit_hash'
-    all_metrics.to_csv('results/static_features.csv', sep=',', index=False)
+    df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 # def join_static_features():
 #     print('join static features...')
