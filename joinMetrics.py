@@ -176,7 +176,7 @@ def join_all_metrics():
     und_values = pd.read_csv('results/understand/und_all.csv', usecols=understand_metrics, sep=',',
                              engine='python', index_col=False)
 
-    evo_metrics = ["project", "commit", "commitprevious", "className", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
+    evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
     evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False)
 
