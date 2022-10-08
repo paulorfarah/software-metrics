@@ -272,7 +272,8 @@ if __name__ == "__main__":
     #     result_df = merge_csv_files(path, tool)
     #     result_df.to_csv(path + tool + '_all.csv', index=False)
 
-    join_all_metrics()
+    # join_all_metrics()
+    join_static_features()
 ################################################# ROGERIO
 # print(result_df.head())
 # #folder with repo: projectA and projectB
