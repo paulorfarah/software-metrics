@@ -175,7 +175,7 @@ def join_all_metrics():
                           "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash', 'project_name']
     und_values = pd.read_csv('results/understand/und_all.csv', index_col=[0, 1, 2, 3, 4, 5, 6], sep=',',
                              engine='python', names=und_metrics)
-    print(und_values.head(1))
+    print(und_values.head(3))
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
