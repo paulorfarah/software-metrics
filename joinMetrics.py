@@ -218,21 +218,24 @@ def join_all_metrics():
 
 
 def join_static_features():
-    df_ck = pd.read_table('results/ck/ck_all.csv', sep=',')
-    df_und = pd.read_table('results/understand/und_all.csv', sep=',')
-    df_evo = pd.read_table('results/evometrics/evometrics_all.csv', sep=',')
-    df_cd = pd.read_table('results/changedistiller/changedistiller_all.csv', sep=',')
-    df_org = pd.read_table('results/organic/organic_all.csv', sep=',')
-    df_ref = pd.read_table('results/refactoring/refactoring_all.csv', sep=',')
+    print('join static features...')
+    # df_ck = pd.read_table('results/ck/ck_all.csv', sep=',')
+    df_und = pd.read_table('results/understand/und_all.csv', sep=',', index_col=False)
+    # df_evo = pd.read_table('results/evometrics/evometrics_all.csv', sep=',')
+    # df_cd = pd.read_table('results/changedistiller/changedistiller_all.csv', sep=',')
+    # df_org = pd.read_table('results/organic/organic_all.csv', sep=',')
+    # df_ref = pd.read_table('results/refactoring/refactoring_all.csv', sep=',')
     # data_frames = [df_ck, df_und, df_evo, df_cd, df_org, df_ref]
 
     # df_all = reduce(lambda left, right: pd.merge(left, right, left_on=['project_name', 'commit_hash', 'class'],
     #                                              right_on=['project_name', 'commit_hash', 'File'], how='outer'),
     #                 [df_ck, df_und])
 
-    df_all = pd.merge(left=df_ck, right=df_und, left_on=['project_name', 'commit_hash'], #, 'class'
-                                                 right_on=['project_name', 'commit_hash'], how='outer') #, 'commit_hash', 'File'
-    df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    # df_all = pd.merge(left=df_ck, right=df_und, left_on=['project_name', 'commit_hash', 'class'], #
+    #                                              right_on=['project_name', 'commit_hash', 'File'], how='outer') #, 'commit_hash'
+    # df_all.to_csv('results/static_features.csv', sep=',', index=False)
+
+    print(df_und.columns)
 
 
 if __name__ == "__main__":
