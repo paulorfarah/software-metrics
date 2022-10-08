@@ -229,7 +229,7 @@ def join_static_features():
     df_all = reduce(lambda left, right: pd.merge(left, right, left_on=['project_name', 'commit_hash', 'class'],
                                                  right_on=['project_name', 'commit_hash', 'File'], how='outer'),
                     [df_ck, df_und])
-    pd.DataFrame.to_csv(df_all, 'results/static_features.csv', sep=',', na_rep='.', index=False)
+    df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 
 if __name__ == "__main__":
