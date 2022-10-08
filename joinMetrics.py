@@ -173,7 +173,7 @@ def join_all_metrics():
                           "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
                           "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
                           "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash', 'project_name']
-    und_values = pd.read_csv('results/understand/und_all.csv', index_col=[1, 2, 3, 4, 5, 6], sep=',',
+    und_values = pd.read_csv('results/understand/und_all.csv', index_col=[0, 1, 2, 3, 4, 5, 6], sep=',',
                              engine='python', names=und_metrics)
     print(und_values.head(1))
 
