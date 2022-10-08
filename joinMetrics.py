@@ -172,9 +172,9 @@ def join_all_metrics():
                           "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
                           "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
                           "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
-                          "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential"]
-    und_values = pd.read_csv('results/understand/und_all.csv', usecols=understand_metrics, sep=',',
-                             engine='python', index_col=False)
+                          "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash', 'project_name']
+    und_values = pd.read_csv('results/understand/und_all.csv', index_col=[1, 2, 3, 4, 5, 6], sep=',',
+                             engine='python')
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
@@ -217,10 +217,10 @@ def join_all_metrics():
     all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
 
 
-def join_static_features():
-    print('join static features...')
-    # df_ck = pd.read_table('results/ck/ck_all.csv', sep=',')
-    df_und = pd.read_table('results/understand/und_all.csv', sep=',', index_col=False)
+# def join_static_features():
+#     print('join static features...')
+    # df_ck = pd.read_csv('results/ck/ck_all.csv', sep=',')
+    # df_und = pd.read_table('results/understand/und_all.csv', sep=',', index_col=False)
     # df_evo = pd.read_table('results/evometrics/evometrics_all.csv', sep=',')
     # df_cd = pd.read_table('results/changedistiller/changedistiller_all.csv', sep=',')
     # df_org = pd.read_table('results/organic/organic_all.csv', sep=',')
@@ -235,7 +235,7 @@ def join_static_features():
     #                                              right_on=['project_name', 'commit_hash', 'File'], how='outer') #, 'commit_hash'
     # df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
-    print(df_und.columns)
+    # print(df_und.columns)
 
 
 if __name__ == "__main__":
@@ -278,8 +278,8 @@ if __name__ == "__main__":
     #     result_df = merge_csv_files(path, tool)
     #     result_df.to_csv(path + tool + '_all.csv', index=False)
 
-    # join_all_metrics()
-    join_static_features()
+    join_all_metrics()
+    # join_static_features()
 ################################################# ROGERIO
 # print(result_df.head())
 # #folder with repo: projectA and projectB
