@@ -226,9 +226,12 @@ def join_static_features():
     df_ref = pd.read_table('results/refactoring/refactoring_all.csv', sep=',')
     # data_frames = [df_ck, df_und, df_evo, df_cd, df_org, df_ref]
 
-    df_all = reduce(lambda left, right: pd.merge(left, right, left_on=['project_name', 'commit_hash', 'class'],
-                                                 right_on=['project_name', 'commit_hash', 'File'], how='outer'),
-                    [df_ck, df_und])
+    # df_all = reduce(lambda left, right: pd.merge(left, right, left_on=['project_name', 'commit_hash', 'class'],
+    #                                              right_on=['project_name', 'commit_hash', 'File'], how='outer'),
+    #                 [df_ck, df_und])
+
+    df_all = pd.merge(left=df_ck, right=df_und, left_on=['project_name', 'commit_hash', 'class'],
+                                                 right_on=['project_name', 'commit_hash', 'File'], how='outer')
     df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 
