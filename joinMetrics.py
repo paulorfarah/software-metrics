@@ -213,9 +213,11 @@ def join_all_metrics():
 
     organic_values = pd.read_csv('results/organic/organic_all.csv', usecols=organic_metrics, sep=',', index_col=False)
 
-    all_metrics = pd.merge(left=ck_values, right=und_values, left_on='class', right_on='Name')
-    all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
-
+    # all_metrics = pd.merge(left=ck_values, right=und_values, left_on='class', right_on='Name')
+    # all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
+    df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'],  #
+                                                                   right_on=['project_name', 'commit_hash', 'File'], how='outer') #, 'commit_hash'
+    all_metrics.to_csv('results/static_features.csv', sep=',', index=False)
 
 # def join_static_features():
 #     print('join static features...')
