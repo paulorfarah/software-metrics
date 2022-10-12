@@ -156,11 +156,11 @@ def join_all_metrics():
                   'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
                   'hasJavaDoc', 'commit_hash', 'project_name']
 
-    ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)
+    ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)#, nrows=5)
     # print("CK ")
     # print(ck_values.shape[0])
 
-    und_metrics = ["Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
+    und_metrics = ["index1","index2","index3","index4","index5","index6","index7","Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
                           "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
                           "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
                           "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
@@ -173,13 +173,14 @@ def join_all_metrics():
                           "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
                           "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
                           "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash', 'project_name']
-    und_values = pd.read_csv('results/understand/und_all.csv', index_col=[0, 1, 2, 3, 4, 5, 6], sep=',',
-                             engine='python', names=und_metrics)
+    und_values = pd.read_csv('results/understand/und_all.csv', sep=',',
+                             engine='python', names=und_metrics)#, nrows=5)
+    und_values = und_values[und_values.columns[8:]]
     print(und_values.head(3))
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
-    evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False)
+    evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False, nrows=5)
 
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
                                "CLASS_PREVIOUSCOMMIT",
@@ -198,7 +199,7 @@ def join_all_metrics():
                                "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES"]
 
     changedistiller_values = pd.read_csv('results/changedistiller/changedistiller_all.csv',
-                                         usecols=changedistiller_metrics, sep=',', index_col=False)
+                                         usecols=changedistiller_metrics, sep=',', index_col=False, nrows=5)
 
     organic_metrics = ["projectName", "commitNumber", "fullyQualifiedName",
                        "PublicFieldCount", "IsAbstract", "ClassLinesOfCode", "WeighOfClass",
@@ -212,7 +213,7 @@ def join_all_metrics():
                        'ShotgunSurgery', 'BrainMethod', 'TotalMethod', 'TotalClassMethod',
                        "DiversityTotal", "DiversityMethod", "DiversityClass"]
 
-    organic_values = pd.read_csv('results/organic/organic_all.csv', usecols=organic_metrics, sep=',', index_col=False)
+    organic_values = pd.read_csv('results/organic/organic_all.csv', usecols=organic_metrics, sep=',', index_col=False, nrows=5)
 
     # all_metrics = pd.merge(left=ck_values, right=und_values, left_on='class', right_on='Name')
     # all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
