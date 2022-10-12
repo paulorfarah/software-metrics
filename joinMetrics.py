@@ -156,6 +156,7 @@ def join_all_metrics():
                   'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
                   'hasJavaDoc', 'commit_hash', 'project_name']
 
+    #ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)#, nrows=5)
     ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)#, nrows=5)
     # print("CK ")
     # print(ck_values.shape[0])
@@ -179,10 +180,20 @@ def join_all_metrics():
     und_values['class'] = und_values['Name']
     print(und_values.head(3))
 
+    df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'], 
+                                                                   right_on=['project_name', 'commit_hash', 'Name'], how='outer') #, 'commit_hash'
+    #df_all.to_csv('results/static_features.csv', sep=',', index=False)
+
+
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
     evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False, nrows=5)
 
+
+    df_all = pd.merge(left=df_all, right=evo_values, left_on=['project_name', 'commit_hash', 'class'], 
+                                                                   right_on=['project_name', 'commit_hash', 'Name'], how='outer') #, 'commit_hash'
+    df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
                                "CLASS_PREVIOUSCOMMIT",
                                "STATEMENT_DELETE", "STATEMENT_INSERT", "STATEMENT_ORDERING_CHANGE",
@@ -218,9 +229,6 @@ def join_all_metrics():
 
     # all_metrics = pd.merge(left=ck_values, right=und_values, left_on='class', right_on='Name')
     # all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
-    df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'],  #
-                                                                   right_on=['project_name', 'commit_hash', 'File'], how='outer') #, 'commit_hash'
-    df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 # def join_static_features():
 #     print('join static features...')
