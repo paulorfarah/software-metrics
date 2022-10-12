@@ -176,6 +176,7 @@ def join_all_metrics():
     und_values = pd.read_csv('results/understand/und_all.csv', sep=',',
                              engine='python', names=und_metrics)#, nrows=5)
     und_values = und_values[und_values.columns[8:]]
+    und_values['class'] = und_values['Name']
     print(und_values.head(3))
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
