@@ -156,10 +156,14 @@ def join_all_metrics():
                   'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
                   'hasJavaDoc', 'commit_hash', 'project_name']
 
-    #ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)#, nrows=5)
-    ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)#, nrows=5)
-    # print("CK ")
-    # print(ck_values.shape[0])
+    ck_values = pd.read_csv('results/ck/ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)
+
+    # clean file system path
+    spl_word = "commons-"
+    file_str = ck_values[ck_values['file'].str.contains(spl_word)].iloc[0]
+    res = file_str['file'].split(spl_word, 1)
+    splitString = res[0]
+    ck_values['file'] = ck_values.file.str.replace(splitString, '')
 
     und_metrics = ["index1","index2","index3","index4","index5","index6","index7","Kind", "Name", "File", "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
                           "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
@@ -178,21 +182,26 @@ def join_all_metrics():
                              engine='python', names=und_metrics)#, nrows=5)
     und_values = und_values[und_values.columns[8:]]
     und_values['class'] = und_values['Name']
-    print(und_values.head(3))
 
-    df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'], 
+    df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'],
                                                                    right_on=['project_name', 'commit_hash', 'Name'], how='outer') #, 'commit_hash'
-    #df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    # df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
                    "CHD", "WCD", "WFR", "ATAF", "LCA", "LCD", "CSB", "CSBS", "ACDF"]
-    evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False, nrows=5)
+    evo_values = pd.read_csv('results/evometrics/evometrics_all.csv', usecols=evo_metrics, sep=',', index_col=False)
 
+    #clean file system path
+    spl_word = "commons-"
+    class_str = evo_values[evo_values['class'].str.contains(spl_word)].iloc[0]
+    res = class_str['class'].split(spl_word, 1)
+    splitString = res[0]
+    evo_values['file'] = evo_values['class'].str.replace(splitString, '')
 
-    df_all = pd.merge(left=df_all, right=evo_values, left_on=['project_name', 'commit_hash', 'class'], 
-                                                                   right_on=['project_name', 'commit_hash', 'Name'], how='outer') #, 'commit_hash'
-    df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    df_all = pd.merge(left=df_all, right=evo_values, left_on=['project_name', 'commit_hash', 'file'],
+                                                                   right_on=['project_name', 'commit_hash', 'file'], how='outer')
+    # df_all.to_csv('results/static_features.csv', sep=',', index=False)
     
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
                                "CLASS_PREVIOUSCOMMIT",
@@ -210,8 +219,11 @@ def join_all_metrics():
                                "ADDING_CLASS_DERIVABILITY", "ADDING_CLASS_DERIVABILITY", "ADDING_METHOD_OVERRIDABILITY",
                                "TOTAL_DECLARATIONPARTCHANGES", "TOTAL_CHANGES"]
 
-    changedistiller_values = pd.read_csv('results/changedistiller/changedistiller_all.csv',
-                                         usecols=changedistiller_metrics, sep=',', index_col=False, nrows=5)
+    cd_values = pd.read_csv('results/changedistiller/changedistiller_all.csv', usecols=changedistiller_metrics,
+                            sep=',', index_col=False)
+
+    df_all = pd.merge(left=df_all, right=cd_values, left_on=['project_name', 'commit_hash', 'class'],
+                      right_on=['PROJECT_NAME', 'CURRENT_COMMIT', 'CLASS_CURRENTCOMMIT'], how='outer')
 
     organic_metrics = ["projectName", "commitNumber", "fullyQualifiedName",
                        "PublicFieldCount", "IsAbstract", "ClassLinesOfCode", "WeighOfClass",
@@ -225,10 +237,143 @@ def join_all_metrics():
                        'ShotgunSurgery', 'BrainMethod', 'TotalMethod', 'TotalClassMethod',
                        "DiversityTotal", "DiversityMethod", "DiversityClass"]
 
-    organic_values = pd.read_csv('results/organic/organic_all.csv', usecols=organic_metrics, sep=',', index_col=False, nrows=5)
+    organic_values = pd.read_csv('results/organic/organic_all.csv', usecols=organic_metrics, sep=',', index_col=False)
 
-    # all_metrics = pd.merge(left=ck_values, right=und_values, left_on='class', right_on='Name')
-    # all_metrics = pd.merge(left=all_metrics, right=und_values, left_on='class', right_on='Name')
+    df_all = pd.merge(left=df_all, right=organic_values, left_on=['project_name', 'commit_hash', 'class'],
+                      right_on=['projectName', 'commitNumber', 'fullyQualifiedName'], how='outer')
+
+    # rm_metrics = ['class_name', 'commit_hash', 'destination Add Attribute Annotation', 'destination Add Attribute Modifier',
+    #               'destination Add Class Annotation', 'destination Add Class Modifier', 'destination Add Method Annotation',
+    #               'destination Add Method Modifier', 'destination Add Parameter', 'destination Add Parameter Annotation',
+    #               'destination Add Parameter Modifier', 'destination Add Thrown Exception Type', 'destination Add Variable Annotation',
+    #               'destination Add Variable Modifier', 'destination Change Attribute Access Modifier', 'destination Change Attribute Type',
+    #               'destination Change Class Access Modifier', 'destination Change Method Access Modifier',
+    #               'destination Change Parameter Type', 'destination Change Return Type', 'destination Change Thrown Exception Type',
+    #               'destination Change Type Declaration Kind', 'destination Change Variable Type', 'destination Collapse Hierarchy', 'destination Encapsulate Attribute',
+    #               'destination Extract And Move Method', 'destination Extract Attribute', 'destination Extract Class',
+    #               'destination Extract Interface', 'destination Extract Method', 'destination Extract Subclass',
+    #               'destination Extract Superclass', 'destination Extract Variable', 'destination Inline Attribute',
+    #               'destination Inline Method', 'destination Inline Variable', 'destination Localize Parameter',
+    #               'destination Merge Attribute', 'destination Merge Class', 'destination Merge Package',
+    #               'destination Merge Parameter', 'destination Merge Variable', 'destination Modify Attribute Annotation',
+    #               'destination Modify Class Annotation', 'destination Modify Method Annotation',
+    #               'destination Modify Variable Annotation', 'destination Move And Inline Method',
+    #               'destination Move And Rename Attribute', 'destination Move And Rename Class',
+    #               'destination Move And Rename Method', 'destination Move Attribute', 'destination Move Class',
+    #               'destination Move Method', 'destination Move Package', 'destination Move Source Folder',
+    #               'destination Parameterize Attribute', 'destination Parameterize Variable', 'destination Pull Up Attribute',
+    #               'destination Pull Up Method', 'destination Push Down Attribute', 'destination Push Down Method',
+    #               'destination Remove Attribute Annotation', 'destination Remove Attribute Modifier',
+    #               'destination Remove Class Annotation', 'destination Remove Class Modifier',
+    #               'destination Remove Method Annotation', 'destination Remove Method Modifier', 'destination Remove Parameter',
+    #               'destination Remove Parameter Annotation', 'destination Remove Parameter Modifier',
+    #               'destination Remove Thrown Exception Type', 'destination Remove Variable Annotation',
+    #               'destination Remove Variable Modifier', 'destination Rename Attribute', 'destination Rename Class',
+    #               'destination Rename Method', 'destination Rename Package', 'destination Rename Parameter',
+    #               'destination Rename Variable', 'destination Reorder Parameter', 'destination Replace Anonymous With Lambda',
+    #               'destination Replace Attribute', 'destination Replace Attribute With Variable',
+    #               'destination Replace Loop With Pipeline', 'destination Replace Pipeline With Loop',
+    #               'destination Replace Variable With Attribute', 'destination Split Attribute',
+    #               'destination Split Class', 'destination Split Conditional', 'destination Split Package',
+    #               'destination Split Parameter', 'destination Split Variable', 'projectName', 'source Add Attribute Annotation',
+    #               'source Add Attribute Modifier', 'source Add Class Annotation', 'source Add Class Modifier',
+    #               'source Add Method Annotation', 'source Add Method Modifier', 'source Add Parameter',
+    #               'source Add Parameter Annotation', 'source Add Parameter Modifier', 'source Add Thrown Exception Type',
+    #               'source Add Variable Annotation', 'source Add Variable Modifier', 'source Change Attribute Access Modifier',
+    #               'source Change Attribute Type', 'source Change Class Access Modifier', 'source Change Method Access Modifier',
+    #               'source Change Parameter Type', 'source Change Return Type', 'source Change Thrown Exception Type',
+    #               'source Change Type Declaration Kind', 'source Change Variable Type', 'source Collapse Hierarchy',
+    #               'source Encapsulate Attribute', 'source Extract And Move Method', 'source Extract Attribute',
+    #               'source Extract Class', 'source Extract Interface', 'source Extract Method', 'source Extract Subclass',
+    #               'source Extract Superclass', 'source Extract Variable', 'source Inline Attribute', 'source Inline Method',
+    #               'source Inline Variable', 'source Localize Parameter', 'source Merge Attribute', 'source Merge Class',
+    #               'source Merge Package', 'source Merge Parameter', 'source Merge Variable', 'source Modify Attribute Annotation',
+    #               'source Modify Class Annotation', 'source Modify Method Annotation', 'source Modify Variable Annotation',
+    #               'source Move And Inline Method', 'source Move And Rename Attribute', 'source Move And Rename Class',
+    #               'source Move And Rename Method', 'source Move Attribute', 'source Move Class', 'source Move Method',
+    #               'source Move Package', 'source Move Source Folder', 'source Parameterize Attribute', 'source Parameterize Variable',
+    #               'source Pull Up Attribute', 'source Pull Up Method', 'source Push Down Attribute', 'source Push Down Method',
+    #               'source Remove Attribute Annotation', 'source Remove Attribute Modifier', 'source Remove Class Annotation',
+    #               'source Remove Class Modifier', 'source Remove Method Annotation', 'source Remove Method Modifier',
+    #               'source Remove Parameter', 'source Remove Parameter Annotation', 'source Remove Parameter Modifier',
+    #               'source Remove Thrown Exception Type', 'source Remove Variable Annotation', 'source Remove Variable Modifier',
+    #               'source Rename Attribute', 'source Rename Class', 'source Rename Method', 'source Rename Package',
+    #               'source Rename Parameter', 'source Rename Variable', 'source Reorder Parameter', 'source Replace Anonymous With Lambda',
+    #               'source Replace Attribute', 'source Replace Attribute With Variable', 'source Replace Loop With Pipeline',
+    #               'source Replace Pipeline With Loop', 'source Replace Variable With Attribute', 'source Split Attribute',
+    #               'source Split Class', 'source Split Conditional', 'source Split Package', 'source Split Parameter',
+    #               'source Split Variable']
+
+    rm_metrics = ['class_name', 'commit_hash', 'destinationAddAttributeAnnotation', 'destinationAddAttributeModifier',
+    'destinationAddClassAnnotation', 'destinationAddClassModifier', 'destinationAddMethodAnnotation',
+    'destinationAddMethodModifier', 'destinationAddParameter', 'destinationAddParameterAnnotation',
+    'destinationAddParameterModifier', 'destinationAddThrownExceptionType', 'destinationAddVariableAnnotation',
+    'destinationAddVariableModifier', 'destinationChangeAttributeAccessModifier', 'destinationChangeAttributeType',
+    'destinationChangeClassAccessModifier', 'destinationChangeMethodAccessModifier',
+    'destinationChangeParameterType', 'destinationChangeReturnType', 'destinationChangeThrownExceptionType',
+    'destinationChangeTypeDeclarationKind', 'destinationChangeVariableType', 'destinationCollapseHierarchy', 'destinationEncapsulateAttribute',
+    'destinationExtractAndMoveMethod', 'destinationExtractAttribute', 'destinationExtractClass',
+    'destinationExtractInterface', 'destinationExtractMethod', 'destinationExtractSubclass',
+    'destinationExtractSuperclass', 'destinationExtractVariable', 'destinationInlineAttribute',
+    'destinationInlineMethod', 'destinationInlineVariable', 'destinationLocalizeParameter',
+    'destinationMergeAttribute', 'destinationMergeClass', 'destinationMergePackage',
+    'destinationMergeParameter', 'destinationMergeVariable', 'destinationModifyAttributeAnnotation',
+    'destinationModifyClassAnnotation', 'destinationModifyMethodAnnotation',
+    'destinationModifyVariableAnnotation', 'destinationMoveAndInlineMethod',
+    'destinationMoveAndRenameAttribute', 'destinationMoveAndRenameClass',
+    'destinationMoveAndRenameMethod', 'destinationMoveAttribute', 'destinationMoveClass',
+    'destinationMoveMethod', 'destinationMovePackage', 'destinationMoveSourceFolder',
+    'destinationParameterizeAttribute', 'destinationParameterizeVariable', 'destinationPullUpAttribute',
+    'destinationPullUpMethod', 'destinationPushDownAttribute', 'destinationPushDownMethod',
+    'destinationRemoveAttributeAnnotation', 'destinationRemoveAttributeModifier',
+    'destinationRemoveClassAnnotation', 'destinationRemoveClassModifier',
+    'destinationRemoveMethodAnnotation', 'destinationRemoveMethodModifier', 'destinationRemoveParameter',
+    'destinationRemoveParameterAnnotation', 'destinationRemoveParameterModifier',
+    'destinationRemoveThrownExceptionType', 'destinationRemoveVariableAnnotation',
+    'destinationRemoveVariableModifier', 'destinationRenameAttribute', 'destinationRenameClass',
+    'destinationRenameMethod', 'destinationRenamePackage', 'destinationRenameParameter',
+    'destinationRenameVariable', 'destinationReorderParameter', 'destinationReplaceAnonymousWithLambda',
+    'destinationReplaceAttribute', 'destinationReplaceAttributeWithVariable',
+    'destinationReplaceLoopWithPipeline', 'destinationReplacePipelineWithLoop',
+    'destinationReplaceVariableWithAttribute', 'destinationSplitAttribute',
+    'destinationSplitClass', 'destinationSplitConditional', 'destinationSplitPackage',
+    'destinationSplitParameter', 'destinationSplitVariable', 'projectName', 'sourceAddAttributeAnnotation',
+    'sourceAddAttributeModifier', 'sourceAddClassAnnotation', 'sourceAddClassModifier',
+    'sourceAddMethodAnnotation', 'sourceAddMethodModifier', 'sourceAddParameter',
+    'sourceAddParameterAnnotation', 'sourceAddParameterModifier', 'sourceAddThrownExceptionType',
+    'sourceAddVariableAnnotation', 'sourceAddVariableModifier', 'sourceChangeAttributeAccessModifier',
+    'sourceChangeAttributeType', 'sourceChangeClassAccessModifier', 'sourceChangeMethodAccessModifier',
+    'sourceChangeParameterType', 'sourceChangeReturnType', 'sourceChangeThrownExceptionType',
+    'sourceChangeTypeDeclarationKind', 'sourceChangeVariableType', 'sourceCollapseHierarchy',
+    'sourceEncapsulateAttribute', 'sourceExtractAndMoveMethod', 'sourceExtractAttribute',
+    'sourceExtractClass', 'sourceExtractInterface', 'sourceExtractMethod', 'sourceExtractSubclass',
+    'sourceExtractSuperclass', 'sourceExtractVariable', 'sourceInlineAttribute', 'sourceInlineMethod',
+    'sourceInlineVariable', 'sourceLocalizeParameter', 'sourceMergeAttribute', 'sourceMergeClass',
+    'sourceMergePackage', 'sourceMergeParameter', 'sourceMergeVariable', 'sourceModifyAttributeAnnotation',
+    'sourceModifyClassAnnotation', 'sourceModifyMethodAnnotation', 'sourceModifyVariableAnnotation',
+    'sourceMoveAndInlineMethod', 'sourceMoveAndRenameAttribute', 'sourceMoveAndRenameClass',
+    'sourceMoveAndRenameMethod', 'sourceMoveAttribute', 'sourceMoveClass', 'sourceMoveMethod',
+    'sourceMovePackage', 'sourceMoveSourceFolder', 'sourceParameterizeAttribute', 'sourceParameterizeVariable',
+    'sourcePullUpAttribute', 'sourcePullUpMethod', 'sourcePushDownAttribute', 'sourcePushDownMethod',
+    'sourceRemoveAttributeAnnotation', 'sourceRemoveAttributeModifier', 'sourceRemoveClassAnnotation',
+    'sourceRemoveClassModifier', 'sourceRemoveMethodAnnotation', 'sourceRemoveMethodModifier',
+    'sourceRemoveParameter', 'sourceRemoveParameterAnnotation', 'sourceRemoveParameterModifier',
+    'sourceRemoveThrownExceptionType', 'sourceRemoveVariableAnnotation', 'sourceRemoveVariableModifier',
+    'sourceRenameAttribute', 'sourceRenameClass', 'sourceRenameMethod', 'sourceRenamePackage',
+    'sourceRenameParameter', 'sourceRenameVariable', 'sourceReorderParameter', 'sourceReplaceAnonymousWithLambda',
+    'sourceReplaceAttribute', 'sourceReplaceAttributeWithVariable', 'sourceReplaceLoopWithPipeline',
+    'sourceReplacePipelineWithLoop', 'sourceReplaceVariableWithAttribute', 'sourceSplitAttribute',
+    'sourceSplitClass', 'sourceSplitConditional', 'sourceSplitPackage', 'sourceSplitParameter',
+    'sourceSplitVariable']
+
+    rm_values = pd.read_csv('results/refactoring/refactoring_all.csv', names=rm_metrics, sep=',', index_col=False)
+
+    rm_values['file'] = rm_values['projectName'] + '/' + rm_values['class_name']
+
+    df_all = pd.merge(left=df_all, right=rm_values, left_on=['project_name', 'commit_hash', 'class'],
+                      right_on=['projectName', 'commit_hash', 'file'], how='outer')
+
+    df_all.to_csv('results/static_features.csv', sep=',', index=False)
 
 # def join_static_features():
 #     print('join static features...')
