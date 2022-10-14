@@ -200,7 +200,7 @@ def join_all_metrics():
     evo_values['file'] = evo_values['class'].str.replace(splitString, '')
 
     df_all = pd.merge(left=df_all, right=evo_values, left_on=['project_name', 'commit_hash', 'file'],
-                                                                   right_on=['project_name', 'commit_hash', 'file'], how='outer')
+                                                                   right_on=['project', 'commit', 'file'], how='outer')
     # df_all.to_csv('results/static_features.csv', sep=',', index=False)
     
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
