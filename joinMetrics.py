@@ -185,7 +185,7 @@ def join_all_metrics():
 
     df_all = pd.merge(left=ck_values, right=und_values, left_on=['project_name', 'commit_hash', 'class'],
                                                                    right_on=['project_name', 'commit_hash', 'Name'], how='outer') #, 'commit_hash'
-    # df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    df_all.to_csv('results/static_features_ck_und.csv', sep=',', index=False)
 
 
     evo_metrics = ["project", "commit", "commitprevious", "class", "BOC", "TACH", "FCH", "LCH", "CHO", "FRCH",
@@ -201,7 +201,7 @@ def join_all_metrics():
 
     df_all = pd.merge(left=df_all, right=evo_values, left_on=['project_name', 'commit_hash', 'file'],
                                                                    right_on=['project', 'commit', 'file'], how='outer')
-    # df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    df_all.to_csv('results/static_features_evo.csv', sep=',', index=False)
     
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
                                "CLASS_PREVIOUSCOMMIT",
@@ -225,6 +225,8 @@ def join_all_metrics():
     df_all = pd.merge(left=df_all, right=cd_values, left_on=['project_name', 'commit_hash', 'class'],
                       right_on=['PROJECT_NAME', 'CURRENT_COMMIT', 'CLASS_CURRENTCOMMIT'], how='outer')
 
+    df_all.to_csv('results/static_features_cd.csv', sep=',', index=False)
+
     organic_metrics = ["projectName", "commitNumber", "fullyQualifiedName",
                        "PublicFieldCount", "IsAbstract", "ClassLinesOfCode", "WeighOfClass",
                        "FANIN", "TightClassCohesion", "FANOUT", "OverrideRatio", "LCOM3",
@@ -241,6 +243,7 @@ def join_all_metrics():
 
     df_all = pd.merge(left=df_all, right=organic_values, left_on=['project_name', 'commit_hash', 'class'],
                       right_on=['projectName', 'commitNumber', 'fullyQualifiedName'], how='outer')
+    df_all.to_csv('results/static_features_org.csv', sep=',', index=False)
 
     # rm_metrics = ['class_name', 'commit_hash', 'destination Add Attribute Annotation', 'destination Add Attribute Modifier',
     #               'destination Add Class Annotation', 'destination Add Class Modifier', 'destination Add Method Annotation',
@@ -373,7 +376,7 @@ def join_all_metrics():
     df_all = pd.merge(left=df_all, right=rm_values, left_on=['project_name', 'commit_hash', 'class'],
                       right_on=['projectName', 'commit_hash', 'file'], how='outer')
 
-    df_all.to_csv('results/static_features.csv', sep=',', index=False)
+    df_all.to_csv('results/static_features_ref.csv', sep=',', index=False)
 
 # def join_static_features():
 #     print('join static features...')
