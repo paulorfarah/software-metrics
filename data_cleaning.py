@@ -16,8 +16,9 @@ with open("unique.csv", "w") as file1:
     # file1.write("Hello \n")
     # file1.writelines(L)
 
-
-    for i in range(df[:, 'cbo_x':'logStatementsQty_x'].shape[1]):
+    df_class = df[:, 'cbo_x':'logStatementsQty_x']
+    print(df_class.head())
+    for i in range(df_class.shape[1]):
         num = len(unique(df.iloc[:, i]))
         percentage = float(num) / df.shape[0] * 100
         if percentage < 1:
