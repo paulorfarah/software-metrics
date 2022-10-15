@@ -8,9 +8,10 @@ df = pd.read_csv('results/ck_all.csv')
 # summarize the dataset
 df.describe().to_csv('ck_describe.csv')
 
-# # summarize the number of unique values in each column (1%)
+# summarize the number of unique values in each column (1%)
+print(df.shape[1])
 for i in range(df.shape[1]):
-    num = len(unique(df[:, i]))
+    num = len(unique(df.iloc[:, i]))
     percentage = float(num) / df.shape[0] * 100
     if percentage < 1:
         print('%d, %d, %.1f%%' % (i, num, percentage))
