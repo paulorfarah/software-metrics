@@ -6,7 +6,7 @@ from numpy import unique
 df = pd.read_csv('results/ck_all.csv')
 
 # summarize the dataset
-df.to_latex('ck.tex')
+df.describe().to_latex('ck.tex')
 
 # # summarize the number of unique values in each column
 # print(df.nunique())
