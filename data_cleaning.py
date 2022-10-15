@@ -15,7 +15,9 @@ with open("unique.csv", "w") as file1:
     # Writing data to a file
     # file1.write("Hello \n")
     # file1.writelines(L)
-    for i in range(df.shape[1]):
+
+
+    for i in range(df[:, 'cbo_x':'logStatementsQty_x'].shape[1]):
         num = len(unique(df.iloc[:, i]))
         percentage = float(num) / df.shape[0] * 100
         if percentage < 1:
@@ -23,15 +25,15 @@ with open("unique.csv", "w") as file1:
             file1.write('%d, %d, %.1f%%' % (i, num, percentage))
 
 #
-# removing columns with low variance
-# get number of unique values for each column
-counts = df.nunique()
-# record columns to delete
-to_del = [i for i, v in enumerate(counts) if (float(v)/df.shape[0]*100) < 1]
-print(to_del)
-# drop useless columns
-df.drop(to_del, axis=1, inplace=True)
-df.to_csv('ck_drop.csv')
+# # removing columns with low variance
+# # get number of unique values for each column
+# counts = df.nunique()
+# # record columns to delete
+# to_del = [i for i, v in enumerate(counts) if (float(v)/df.shape[0]*100) < 1]
+# print(to_del)
+# # drop useless columns
+# df.drop(to_del, axis=1, inplace=True)
+# df.to_csv('ck_drop.csv')
 #
 # def evaluate_features_threshold():
 #     # split data into inputs and outputs
