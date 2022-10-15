@@ -4,13 +4,18 @@ from numpy import loadtxt, percentile, nan
 from numpy import unique
 # load the dataset
 
-ignored_cols = {'ck_100': ['file', 'class', 'type', 'method', 'constructor', 'commit_hash', 'project_name']}
+ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit_hash', 'project_name'],
+                'evometrics': ['project', 'commit', 'commitprevious', 'class', 'release'],
+                'organic': ['projectName', 'commitNumber' ,'fullyQualifiedName'],
+                'refactoring': ['class_name', 'commit_hash', 'projectName'],
+                'und': ['Kind', 'Name' ,'File', 'commit_hash', 'project_name'],
+                'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT']}
 
-# metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-# for metric in metrics:
-#     df = pd.read_csv('results/' + metric + '_all.csv')
-local = True
-if local:
+metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
+for metric in metrics:
+    df = pd.read_csv('results/' + metric + '_all.csv')
+# local = True
+# if local:
     metric = 'ck_100'
     df = pd.read_csv('results/ck_all_100.csv')
     # summarize the dataset
