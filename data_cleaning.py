@@ -16,8 +16,8 @@ for metric in metrics:
     df = pd.read_csv('results/' + metric + '_all.csv')
 # local = True
 # if local:
-    metric = 'ck_100'
-    df = pd.read_csv('results/ck_all_100.csv')
+#     metric = 'ck_100'
+#     df = pd.read_csv('results/ck_all_100.csv')
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
 
