@@ -10,11 +10,17 @@ df.describe().to_csv('ck_describe.csv')
 
 # summarize the number of unique values in each column (1%)
 print(df.shape[1])
-for i in range(df.shape[1]):
-    num = len(unique(df.iloc[:, i]))
-    percentage = float(num) / df.shape[0] * 100
-    if percentage < 1:
-        print('%d, %d, %.1f%%' % (i, num, percentage))
+# Writing to file
+with open("unique.csv", "w") as file1:
+    # Writing data to a file
+    # file1.write("Hello \n")
+    # file1.writelines(L)
+    for i in range(df.shape[1]):
+        num = len(unique(df.iloc[:, i]))
+        percentage = float(num) / df.shape[0] * 100
+        if percentage < 1:
+            # print('%d, %d, %.1f%%' % (i, num, percentage))
+            file1.write('%d, %d, %.1f%%' % (i, num, percentage))
 
 #
 # removing columns with low variance
