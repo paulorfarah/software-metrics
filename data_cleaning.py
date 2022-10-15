@@ -8,26 +8,23 @@ df = pd.read_csv('results/ck_all.csv')
 # summarize the dataset
 df.describe().to_csv('ck_describe.csv')
 
-# # summarize the number of unique values in each column
-# print(df.nunique())
-#
 # # summarize the number of unique values in each column (1%)
-# for i in range(df.shape[1]):
-#     num = len(unique(df[:, i]))
-#     percentage = float(num) / df.shape[0] * 100
-#     if percentage < 1:
-#         print('%d, %d, %.1f%%' % (i, num, percentage))
+for i in range(df.shape[1]):
+    num = len(unique(df[:, i]))
+    percentage = float(num) / df.shape[0] * 100
+    if percentage < 1:
+        print('%d, %d, %.1f%%' % (i, num, percentage))
+
 #
-#
-# # removing columns with low variance
-# # get number of unique values for each column
-# counts = df.nunique()
-# # record columns to delete
-# to_del = [i for i, v in enumerate(counts) if (float(v)/df.shape[0]*100) < 1]
-# print(to_del)
-# # drop useless columns
-# df.drop(to_del, axis=1, inplace=True)
-# print(df.shape)
+# removing columns with low variance
+# get number of unique values for each column
+counts = df.nunique()
+# record columns to delete
+to_del = [i for i, v in enumerate(counts) if (float(v)/df.shape[0]*100) < 1]
+print(to_del)
+# drop useless columns
+df.drop(to_del, axis=1, inplace=True)
+df.to_csv('ck_drop.csv')
 #
 # def evaluate_features_threshold():
 #     # split data into inputs and outputs
