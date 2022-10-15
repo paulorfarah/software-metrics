@@ -6,7 +6,7 @@ from numpy import unique
 df = pd.read_csv('results/ck_all.csv')
 
 # summarize the dataset
-df.describe().to_csv('ck_describe.csv', index=False)
+df.describe().to_csv('ck_describe.csv')
 
 # # summarize the number of unique values in each column
 # print(df.nunique())
