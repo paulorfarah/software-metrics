@@ -70,12 +70,12 @@ for metric in metrics:
     # record columns to delete
     to_del = [df.columns[i] for i, v in enumerate(counts) if ((float(v)/df.shape[0]*100) < 1) and (df.columns[i] not in ignored_cols[metric])]
 
-    with open("results/" + metric + "_clean.csv", "w") as file1:
+    with open("results/dropped_cols_" + metric + ".csv", "w") as file1:
         for col in to_del:
             file1.write(col + '\n')
     # drop useless columns
     df.drop(to_del, axis=1, inplace=True)
-    df.to_csv('results/drop_' + metric + '.csv')
+    df.to_csv('results/' + metric + '_clean.csv')
 
 # def evaluate_features_threshold():
 #     # split data into inputs and outputs
