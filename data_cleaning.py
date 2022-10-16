@@ -10,14 +10,37 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
                 'refactoring': ['class_name', 'commit_hash', 'projectName'],
                 'und': ['Kind', 'Name' ,'File', 'commit_hash', 'project_name'],
                 'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT']}
-
-metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-for metric in metrics:
-    df = pd.read_csv('results/' + metric + '_all.csv')
+######################################################
 # local = True
 # if local:
 #     metric = 'ck_100'
 #     df = pd.read_csv('results/ck_all_100.csv')
+#######################################################
+# metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
+metrics = ['refactoring']
+for metric in metrics:
+
+    if not metric == 'und':
+        df = pd.read_csv('results/' + metric + '_all.csv')
+    else:
+        und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
+                       "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
+                       "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
+                       "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
+                       "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
+                       "CountDeclInstanceVariable", "CountDeclMethod", "CountDeclMethodAll",
+                       "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                       "CountDeclMethodPublic", "CountInput", "CountLine", "CountLineBlank", "CountLineCode",
+                       "CountLineCodeDecl", "CountLineCodeExe", "CountLineComment", "CountOutput", "CountPath",
+                       "CountSemicolon", "CountStmt", "CountStmtDecl", "CountStmtExe", "Cyclomatic",
+                       "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
+                       "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
+                       "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
+                       "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
+                       'project_name']
+        df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics)
+        df = df[df.columns[8:]]
+
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
 
