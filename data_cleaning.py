@@ -16,8 +16,7 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #     metric = 'ck_100'
 #     df = pd.read_csv('results/ck_all_100.csv')
 #######################################################
-# metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-metrics = ['refactoring']
+metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
 for metric in metrics:
 
     if not metric == 'und':
