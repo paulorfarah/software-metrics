@@ -55,10 +55,11 @@ for metric in metrics:
         # print(df_class.head())
         for i in range(df.shape[1]):
             if not df.columns[i] in ignored_cols[metric]:
+                print(df.columns[i])
                 num = len(unique(df.iloc[:, i]))
                 percentage = float(num) / df.shape[0] * 100
                 if percentage < 1.0:
-                    print('%s, %d, %.2f%%' % (df.columns[i], num, percentage))
+                    # print('%s, %d, %.2f%%' % (df.columns[i], num, percentage))
                     file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
 
 
