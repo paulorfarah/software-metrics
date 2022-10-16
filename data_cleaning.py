@@ -2,6 +2,10 @@
 import pandas as pd
 from numpy import loadtxt, percentile, nan
 from numpy import unique
+
+# pd.set_option('display.max_columns', 500)
+# pd.set_option('display.width', 1000)
+
 # load the dataset
 
 ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit_hash', 'project_name'],
@@ -17,9 +21,11 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #     df = pd.read_csv('results/ck_all_100.csv')
 #######################################################
 metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
+# metrics = ['und']
 for metric in metrics:
-
+    print('reading dataset: ' + metric)
     if not metric == 'und':
+
         df = pd.read_csv('results/' + metric + '_all.csv')
     else:
         und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
@@ -37,8 +43,10 @@ for metric in metrics:
                        "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
                        "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
                        'project_name']
-        df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics)
-        df = df[df.columns[8:]]
+        df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
+        df = df[df.columns[7:]]
+        print(df.head())
+        # print(df['AvgCyclomatic'])
 
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
