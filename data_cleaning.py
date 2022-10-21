@@ -13,15 +13,16 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
                 'organic': ['projectName', 'commitNumber' ,'fullyQualifiedName'],
                 'refactoring': ['class_name', 'commit_hash', 'projectName'],
                 'und': ['Kind', 'Name' ,'File', 'commit_hash', 'project_name'],
-                'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT']}
+                'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT'],
+                'perform': ['class_name', 'method_name', 'commit_hash', 'committer_date_x']}
 ######################################################
 # local = True
 # if local:
 #     metric = 'ck_100'
 #     df = pd.read_csv('results/ck_all_100.csv')
 #######################################################
-metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-# metrics = ['und']
+# metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
+metrics = ['perform']
 for metric in metrics:
     print('reading dataset: ' + metric)
     if not metric == 'und':
