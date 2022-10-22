@@ -23,52 +23,46 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #######################################################
 # metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
 metrics = ['perform']
+
+
+def format_understand():
+    und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
+                   "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
+                   "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
+                   "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
+                   "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
+                   "CountDeclInstanceVariable", "CountDeclMethod", "CountDeclMethodAll",
+                   "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                   "CountDeclMethodPublic", "CountInput", "CountLine", "CountLineBlank", "CountLineCode",
+                   "CountLineCodeDecl", "CountLineCodeExe", "CountLineComment", "CountOutput", "CountPath",
+                   "CountSemicolon", "CountStmt", "CountStmtDecl", "CountStmtExe", "Cyclomatic",
+                   "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
+                   "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
+                   "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
+                   "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
+                   'project_name']
+    df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
+    df = df[df.columns[7:]]
+    return df
+
+
 for metric in metrics:
     print('reading dataset: ' + metric)
     if not metric == 'und':
-
         df = pd.read_csv('results/' + metric + '_all.csv')
     else:
-        und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
-                       "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
-                       "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
-                       "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
-                       "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
-                       "CountDeclInstanceVariable", "CountDeclMethod", "CountDeclMethodAll",
-                       "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
-                       "CountDeclMethodPublic", "CountInput", "CountLine", "CountLineBlank", "CountLineCode",
-                       "CountLineCodeDecl", "CountLineCodeExe", "CountLineComment", "CountOutput", "CountPath",
-                       "CountSemicolon", "CountStmt", "CountStmtDecl", "CountStmtExe", "Cyclomatic",
-                       "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
-                       "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
-                       "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
-                       "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
-                       'project_name']
-        df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
-        df = df[df.columns[7:]]
-        print(df.head())
-        # print(df['AvgCyclomatic'])
+        df = format_understand()
 
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
 
     # summarize the number of unique values in each column (1%)
-    # print(df.shape[1])
-    # Writing to file
     with open("results/variability_" + metric + ".csv", "w") as file1:
-        # Writing data to a file
-        # file1.write("Hello \n")
-        # file1.writelines(L)
-
-        # df_class = df[:, 'cbo_x':'logStatementsQty_x']
-        # print(df_class.head())
         for i in range(df.shape[1]):
             if not df.columns[i] in ignored_cols[metric]:
-                print(df.columns[i])
                 num = len(unique(df.iloc[:, i]))
                 percentage = float(num) / df.shape[0] * 100
                 if percentage < 1.0:
-                    # print('%s, %d, %.2f%%' % (df.columns[i], num, percentage))
                     file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
 
 
