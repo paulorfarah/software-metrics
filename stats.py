@@ -16,11 +16,15 @@ projects = {'bcel': ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8
 def check_commits(file, col):
     df = pd.read_csv(file)
     print('### ' + file + '###')
-    for project_name, versions in projects.items():
-        print('--- ' + project_name + ' ---')
-        for ver in versions:
-            if not ver in df[col].unique():
-                print(project_name, ver)
+    with open("results/check_commits_" + file, "w") as file1:
+
+        for project_name, versions in projects.items():
+            print('--- ' + project_name + ' ---')
+            file1.write('--- ' + project_name + ' ---' + '\n')
+            for ver in versions:
+                if not ver in df[col].unique():
+                    print(project_name, ver)
+                    file1.write(project_name, ver + '\n')
     print('##########')
 
 
