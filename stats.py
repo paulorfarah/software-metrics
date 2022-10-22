@@ -13,28 +13,29 @@ projects = {'bcel': ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8
 
 
 
-def check_commits(file):
+def check_commits(file, col):
     df = pd.read_csv(file)
     print('### ' + file + '###')
     for project_name, versions in projects.items():
         print('--- ' + project_name + ' ---')
         for ver in versions:
-            if not ver in df['commit_hash'].unique():
+            if not ver in df[col].unique():
                 print(project_name, ver)
     print('##########')
 
 
 print('starting to check the commits...')
 csv = 'results/ck_all.csv'
-check_commits(csv)
+check_commits(csv, 'commit_hash')
 csv = 'results/und_all.csv'
-check_commits(csv)
+check_commits(csv, 'commit_hash')
 csv = 'results/changedistiller_all.csv'
-check_commits(csv)
+check_commits(csv, 'PREVIOUS_COMMIT')
 csv = 'results/organic_all.csv'
-check_commits(csv)
+check_commits(csv, 'commitNumber')
 csv = 'results/evometrics_all.csv'
-check_commits(csv)
+check_commits(csv, 'commit')
 csv = 'results/refactoring_all.csv'
+check_commits(csv, 'commit_hash')
 
 print('end')
