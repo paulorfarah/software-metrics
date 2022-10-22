@@ -24,7 +24,7 @@ def check_commits(file, col):
             for ver in versions:
                 if not ver in df[col].unique():
                     print(project_name, ver)
-                    file1.write(project_name, ver + '\n')
+                    file1.write(project_name + '_' + ver + '\n')
     print('##########')
 
 
