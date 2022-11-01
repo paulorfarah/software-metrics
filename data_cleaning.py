@@ -70,7 +70,7 @@ def format_resources_avg():
 
     #res_avg_types = {‘a’: np.float64, ‘b’: np.int32, ‘c’: ‘Int64’}
     res_avg_types = {'method_id': int,'committer_date': str,'commit_hash': str,'run': int,'class_name': str,'method_name': str,
-                       'method_started_at': str,'method_ended_at': str,'caller_id': int,'own_duration': float,'cumulative_duration':float,
+                       'method_started_at': str,'method_ended_at': str,'caller_id': str,'own_duration': float,'cumulative_duration':float,
                        'AVG(active)': float,'AVG(available)': float,'AVG(buffers)': float,'AVG(cached) ': float,'AVG(child_major_faults)': float,
                        'AVG(child_minor_faults)': float,'AVG(commit_limit)': float,'AVG(committed_as)': float,'AVG(cpu_percent)': float,
                        'AVG(data)': float,'AVG(dirty)': float,'AVG(free)': float,'AVG(high_free)': float,'AVG(high_total)': float,'AVG(huge_pages_total)': float,
