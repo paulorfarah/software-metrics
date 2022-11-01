@@ -23,38 +23,41 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #######################################################
 # metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
 metrics = ['perform']
+
+
+def prepare_understand_dataset():
+    und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
+                   "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
+                   "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
+                   "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
+                   "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
+                   "CountDeclInstanceVariable", "CountDeclMethod", "CountDeclMethodAll",
+                   "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                   "CountDeclMethodPublic", "CountInput", "CountLine", "CountLineBlank", "CountLineCode",
+                   "CountLineCodeDecl", "CountLineCodeExe", "CountLineComment", "CountOutput", "CountPath",
+                   "CountSemicolon", "CountStmt", "CountStmtDecl", "CountStmtExe", "Cyclomatic",
+                   "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
+                   "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
+                   "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
+                   "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
+                   'project_name']
+    df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
+    df = df[df.columns[7:]]
+    return df
+
+
 for metric in metrics:
     print('reading dataset: ' + metric)
     if not metric == 'und':
 
         df = pd.read_csv('results/' + metric + '_all.csv')
     else:
-        und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
-                       "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
-                       "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
-                       "CountClassCoupled", "CountClassDerived", "CountDeclClass", "CountDeclClassMethod",
-                       "CountDeclClassVariable", "CountDeclFile", "CountDeclFunction", "CountDeclInstanceMethod",
-                       "CountDeclInstanceVariable", "CountDeclMethod", "CountDeclMethodAll",
-                       "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
-                       "CountDeclMethodPublic", "CountInput", "CountLine", "CountLineBlank", "CountLineCode",
-                       "CountLineCodeDecl", "CountLineCodeExe", "CountLineComment", "CountOutput", "CountPath",
-                       "CountSemicolon", "CountStmt", "CountStmtDecl", "CountStmtExe", "Cyclomatic",
-                       "CyclomaticModified", "CyclomaticStrict", "Essential", "MaxCyclomatic",
-                       "MaxCyclomaticModified", "MaxCyclomaticStrict", "MaxEssential", "MaxInheritanceTree",
-                       "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
-                       "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
-                       'project_name']
-        df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
-        df = df[df.columns[7:]]
-        print(df.head())
-        # print(df['AvgCyclomatic'])
+        df = prepare_understand_dataset()
 
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
 
     # summarize the number of unique values in each column (1%)
-    # print(df.shape[1])
-    # Writing to file
     with open("results/variability_" + metric + ".csv", "w") as file1:
         # Writing data to a file
         # file1.write("Hello \n")
