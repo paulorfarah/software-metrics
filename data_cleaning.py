@@ -50,11 +50,11 @@ def format_understand():
 
 def format_resources_avg():
     res_avg_metrics = ['method_id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
-                       'method_started_at', 'method_ended_at', 'methods.caller_id', 'own_duration', 'cumulative_duration',
+                       'method_started_at', 'method_ended_at', 'caller_id', 'own_duration', 'cumulative_duration',
                        'AVG(active)', 'AVG(available)', 'AVG(buffers)', 'AVG(cached) ', 'AVG(child_major_faults)',
                        'AVG(child_minor_faults)', 'AVG(commit_limit)', 'AVG(committed_as)', 'AVG(cpu_percent)',
                        'AVG(data)', 'AVG(dirty)', 'AVG(free)', 'AVG(high_free)', 'AVG(high_total)', 'AVG(huge_pages_total)',
-                       'AVG(huge_pages_free)', 'AVG(huge_pages_total)', 'AVG(hwm)', 'AVG(inactive)', 'AVG(laundry)',
+                       'AVG(huge_pages_free)', 'AVG(huge_pages_total_copy)', 'AVG(hwm)', 'AVG(inactive)', 'AVG(laundry)',
                        'AVG(load1)', 'AVG(load5)', 'AVG(load15)', 'AVG(locked)', 'AVG(low_free)', 'AVG(low_total)',
                        'AVG(major_faults)', 'AVG(mapped)', 'AVG(mem_percent)', 'AVG(minor_faults)', 'AVG(page_tables)',
                        'AVG(pg_fault)', 'AVG(pg_in)', 'AVG(pg_maj_faults)', 'AVG(pg_out)', 'AVG(read_bytes)',
