@@ -1,4 +1,7 @@
 # summarize the number of unique values for each column using numpy
+import datetime
+
+import numpy as np
 import pandas as pd
 from numpy import loadtxt, percentile, nan
 from numpy import unique
@@ -65,7 +68,23 @@ def format_resources_avg():
                        'AVG(vmalloc_used)', 'AVG(wired)', 'AVG(write_back)', 'AVG(write_back_tmp)', 'AVG(write_bytes)',
                        'AVG(write_count)']
 
-    df = pd.read_csv('res_avg.csv', sep=';', names=res_avg_metrics)
+    #res_avg_types = {‘a’: np.float64, ‘b’: np.int32, ‘c’: ‘Int64’}
+    res_avg_types = {'method_id': int,'committer_date': datetime.date,'commit_hash': str,'run': int,'class_name': str,'method_name': str,
+                       'method_started_at': datetime.datetime,'method_ended_at': datetime.datetime,'caller_id': int,'own_duration': float,'cumulative_duration':float,
+                       'AVG(active)': float,'AVG(available)': float,'AVG(buffers)': float,'AVG(cached) ': float,'AVG(child_major_faults)': float,
+                       'AVG(child_minor_faults)': float,'AVG(commit_limit)': float,'AVG(committed_as)': float,'AVG(cpu_percent)': float,
+                       'AVG(data)': float,'AVG(dirty)': float,'AVG(free)': float,'AVG(high_free)': float,'AVG(high_total)': float,'AVG(huge_pages_total)': float,
+                       'AVG(huge_pages_free)': float,'AVG(huge_pages_total_copy)': float,'AVG(hwm)': float,'AVG(inactive)': float,'AVG(laundry)': float,
+                       'AVG(load1)': float,'AVG(load5)': float,'AVG(load15)': float,'AVG(locked)': float,'AVG(low_free)': float,'AVG(low_total)': float,
+                       'AVG(major_faults)': float,'AVG(mapped)': float,'AVG(mem_percent)': float,'AVG(minor_faults)': float,'AVG(page_tables)': float,
+                       'AVG(pg_fault)': float,'AVG(pg_in)': float,'AVG(pg_maj_faults)': float,'AVG(pg_out)': float,'AVG(read_bytes)': float,
+                       'AVG(read_count)': float,'AVG(rss)': float,'AVG(shared)': float,'AVG(sin)': float,'AVG(slab)': float,'AVG(sout)': float,
+                       'AVG(sreclaimable)': float,'AVG(stack)': float,'AVG(sunreclaim)': float,'AVG(swap)': float,'AVG(swap_cached)': float,
+                       'AVG(swap_free)': float,'AVG(swap_total)': float,'AVG(swap_used)': float,'AVG(swap_used_percent) ': float,'AVG(total)': float,
+                       'AVG(used)': float,'AVG(used_percent)': float,'AVG(vm_s)': float,'AVG(vmalloc_chunk)': float,'AVG(vmalloc_total)': float,
+                       'AVG(vmalloc_used)': float,'AVG(wired)': float,'AVG(write_back)': float,'AVG(write_back_tmp)': float,'AVG(write_bytes)': float}
+
+    df = pd.read_csv('res_avg.csv', sep=';', names=res_avg_metrics, dtype=res_avg_types)
     return df
 
 for metric in metrics:
@@ -89,8 +108,6 @@ for metric in metrics:
                 percentage = float(num) / df.shape[0] * 100
                 if percentage < 1.0:
                     file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
-
-
 
     # removing columns with low variance
     # get number of unique values for each column
