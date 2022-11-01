@@ -22,7 +22,7 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #     df = pd.read_csv('results/ck_all_100.csv')
 #######################################################
 # metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-metrics = ['perform']
+metrics = ['res_avg']
 
 
 def format_understand():
