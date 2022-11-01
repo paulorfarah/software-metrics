@@ -45,13 +45,35 @@ def format_understand():
     df = df[df.columns[7:]]
     return df
 
+def format_resources_avg():
+    res_avg_metrics = ['methods.id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
+                       'method_started_at', 'method_ended_at', 'methods.caller_id', 'own_duration', 'cumulative_duration',
+                       'AVG(active)', 'AVG(available)', 'AVG(buffers)', 'AVG(cached) ', 'AVG(child_major_faults)',
+                       'AVG(child_minor_faults)', 'AVG(commit_limit)', 'AVG(committed_as)', 'AVG(cpu_percent)',
+                       'AVG(data)', 'AVG(dirty)', 'AVG(free)', 'AVG(high_free)', 'AVG(high_total)', 'AVG(huge_pages_total)',
+                       'AVG(huge_pages_free)', 'AVG(huge_pages_total)', 'AVG(hwm)', 'AVG(inactive)', 'AVG(laundry)',
+                       'AVG(load1)', 'AVG(load5)', 'AVG(load15)', 'AVG(locked)', 'AVG(low_free)', 'AVG(low_total)',
+                       'AVG(major_faults)', 'AVG(mapped)', 'AVG(mem_percent)', 'AVG(minor_faults)', 'AVG(page_tables)',
+                       'AVG(pg_fault)', 'AVG(pg_in)', 'AVG(pg_maj_faults)', 'AVG(pg_out)', 'AVG(read_bytes)',
+                       'AVG(read_count)', 'AVG(rss)', 'AVG(shared)', 'AVG(sin)', 'AVG(slab)', 'AVG(sout)',
+                       'AVG(sreclaimable)', 'AVG(stack)', 'AVG(sunreclaim)', 'AVG(swap)', 'AVG(swap_cached)',
+                       'AVG(swap_free)', 'AVG(swap_total)', 'AVG(swap_used)', 'AVG(swap_used_percent) ', 'AVG(total)',
+                       'AVG(used)', 'AVG(used_percent)', 'AVG(vm_s)', 'AVG(vmalloc_chunk)', 'AVG(vmalloc_total)',
+                       'AVG(vmalloc_used)', 'AVG(wired)', 'AVG(write_back)', 'AVG(write_back_tmp)', 'AVG(write_bytes)',
+                       'AVG(write_count)']
+
+    df = pd.read_csv('res_avg.csv', sep=',', names=res_avg_metrics)
+    return df
 
 for metric in metrics:
     print('reading dataset: ' + metric)
-    if not metric == 'und':
-        df = pd.read_csv('results/' + metric + '_all.csv')
-    else:
+    if metric == 'und':
         df = format_understand()
+    elif metric == 'res_avg':
+        df = format_resources_avg()
+    else:
+        df = pd.read_csv('results/' + metric + '_all.csv')
+
 
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')

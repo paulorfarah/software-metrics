@@ -17,7 +17,6 @@ def check_commits(file, col):
     df = pd.read_csv(file)
     print('### ' + file + '###')
     with open("results/check_commits_" + file, "w") as file1:
-
         for project_name, versions in projects.items():
             print('--- ' + project_name + ' ---')
             file1.write('--- ' + project_name + ' ---' + '\n')
