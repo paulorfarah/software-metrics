@@ -14,7 +14,10 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
                 'refactoring': ['class_name', 'commit_hash', 'projectName'],
                 'und': ['Kind', 'Name' ,'File', 'commit_hash', 'project_name'],
                 'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT'],
-                'perform': ['class_name', 'method_name', 'commit_hash', 'committer_date_x']}
+                'perform': ['class_name', 'method_name', 'commit_hash', 'committer_date_x'],
+                'res_avg': ['method_id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
+                       'method_started_at', 'method_ended_at', 'methods.caller_id']
+                }
 ######################################################
 # local = True
 # if local:
@@ -46,7 +49,7 @@ def format_understand():
     return df
 
 def format_resources_avg():
-    res_avg_metrics = ['methods.id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
+    res_avg_metrics = ['method_id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
                        'method_started_at', 'method_ended_at', 'methods.caller_id', 'own_duration', 'cumulative_duration',
                        'AVG(active)', 'AVG(available)', 'AVG(buffers)', 'AVG(cached) ', 'AVG(child_major_faults)',
                        'AVG(child_minor_faults)', 'AVG(commit_limit)', 'AVG(committed_as)', 'AVG(cpu_percent)',
