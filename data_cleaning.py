@@ -65,7 +65,7 @@ def format_resources_avg():
                        'AVG(vmalloc_used)', 'AVG(wired)', 'AVG(write_back)', 'AVG(write_back_tmp)', 'AVG(write_bytes)',
                        'AVG(write_count)']
 
-    df = pd.read_csv('res_avg.csv', sep=',', names=res_avg_metrics)
+    df = pd.read_csv('res_avg.csv', sep=';', names=res_avg_metrics)
     return df
 
 for metric in metrics:
