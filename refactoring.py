@@ -85,6 +85,7 @@ if __name__ == "__main__":
     ap.add_argument('--project_name', required=True)
     ap.add_argument('--git_repo_folder_A', required=True)
     ap.add_argument('--git_repo_folder_B', required=True)
+    ap.add_argument('--commits', required=True, help='csv with list of commits to compare commitA and commitB')
     ap.add_argument('--mode', required=True, help='mode - tag for commits with tag, csv - for csv of commits')
     args = ap.parse_args()
 
@@ -162,11 +163,46 @@ if __name__ == "__main__":
                     convertJson(writer, refactoring_dict, hashCurrent)
                 # for row in rows:
 
-
                 tag_previous = tag_current
                 release += 1
 
         else:
-            print('ATTENTION: mode not implemented.')
+            print('csv mode.')
+            versions = []
+            with open(args.commits) as f:
+                versions = f.read().splitlines()
+                versions.reverse()
+
+                version_prev = versions[0]
+                # row = ['project', 'commit', 'commitprevious', 'class', 'release', 'BOC', 'TACH', 'FCH', 'LCH',
+                #        'CHO', 'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
+                row = refactoring_list
+
+                pathA.checkout(version_prev)
+                print('checkout hashCurrent: ' + version_prev)
+                repo = git.Repo(args.git_repo_folder_A)
+
+                for version in versions[1:]:
+                    print('######################## hashCurrent #############################', version)
+                    pathA.checkout(version)
+                    refactoring_dict = {version: {}}
+                    if release == 1:
+                        row = ['commit', 'refactoring', 'filePath', 'codeElementType', 'source',
+                               'destination']
+                    else:
+                        # hashPrevious = pathA.get_commit_from_tag(tag_previous.name).hash
+                        pathB.checkout(version_prev)
+                        commits_range = Repository(args.git_repo_folder_A, from_commit=version_prev,
+                                                   to_commit=version).traverse_commits()
+                        for cc in commits_range:
+                            print(cc.hash)
+                            path_to_json_file = 'results/refactoring/json/' + args.project_name + '_' + cc.hash + '-refactoringminer.json'
+                            out = os.popen(
+                                'RefactoringMiner-2.3.2/bin/RefactoringMiner -c ' + args.git_repo_folder_A + ' ' + cc.hash + ' -json ' + path_to_json_file).read()
+                            refactoring_dict = parse_json(path_to_json_file, refactoring_dict, version)
+
+                        convertJson(writer, refactoring_dict, version)
+                    version_prev = version
+                    release += 1
 
     print(args.project_name + ' ended.')
