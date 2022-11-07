@@ -66,6 +66,7 @@ if __name__ == "__main__":
         version_prev = versions[0]
         row = ['project', 'commit', 'commitprevious', 'class', 'release', 'BOC', 'TACH', 'FCH', 'LCH',
                'CHO', 'FRCH', 'CHD', 'WCD', 'WFR', 'ATAF', 'LCA', 'LCD', 'CSB', 'CSBS', 'ACDF']
+        writer.writerow(row)
 
         pathA.checkout(version_prev)
         print('checkout hashCurrent: ' + version_prev)
@@ -74,7 +75,6 @@ if __name__ == "__main__":
             if (file not in bocArray):
                 bocArray[file] = release
                 fchArray[file] = 0
-        writer.writerow(row)
 
         for version in versions[1:]:
             pathA.checkout(version)
