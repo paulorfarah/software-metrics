@@ -25,13 +25,37 @@ def read_csv(file):
     df = pd.read_csv(file, names=cols, sep=';', header=None)
     return df
 
-def read_csv_lines(file):
+def split_commits(file, commit_list, delimiter=';', quotechar='"'):
+    #create files
+    f = []
+    for i in range(len(commit_list)):
+        f.append(open(str(i) + ".csv", "w"))
     with open(file, 'r') as csvfile:
-        datareader = csv.reader(csvfile)
-        for row in datareader:
-            print(row)
+        datareader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
+        for r in datareader:
+            commit_hash = r[2]
+            i = commit_list.index(commit_hash)
+            if r:
+                # f[i].write("\"")
+                string = '; '.join(r)
+                for item in string:
+                    f[i].write(item)
+                # f[i].write("\"")
+                f[i].write("\n")
 
-def stat_analysis(df):
+    for i in range(len(commit_list)):
+        f[i].close()
+
+
+
+
+# for l,el in enumerate(stats):
+#         string = ', '.join(map(str,el))
+#         for item in string:
+#             f.write(item)
+#     f.write('\n')
+
+def stat_analysis(df, output):
 
     val_cols = ['commit_hash', 'class_name', 'method_name', 'own_duration', 'cumulative_duration', 'active',
                 'available', 'buffers', 'cached ', 'child_major_faults', 'child_minor_faults', 'commit_limit',
@@ -62,17 +86,40 @@ def stat_analysis(df):
 
 
 
-    pd.DataFrame.to_csv(df_merged, 'merged.csv', sep=',', index=False)
+    pd.DataFrame.to_csv(df_merged, output, sep=',', index=False)
 
 
 def main():
+    project_name = 'easymock'
+    # commits_list = None
+    commits_list = ['1a01c13b73c0c66de1efa3db4d73a839aaf20ab9', '266c64660523d728592e646fa9f3f3e2fdfdbc4a',
+                    'caf80a128f00481e8c19151257001015acc3e76e', 'a6e7c7e6fc54c8ee3dce10edbe76c1821f10cd92',
+                    '0c45595df8f8a0939dbc0b0385c8afe7502b1190', '853c1e35326a54e3fc28177c5c84c07652750140',
+                    '3506ccdfa91500016e3a0908d7ccabc171aa5602', '22ade6817ad07f22f1d8f0263ff6ddc6fc9b05db',
+                    '36782213bf5e8f1e0f601cb73774ec7a5a8c58f1']
+
     print('starting...')
     file = '/mnt/sda4/resources.csv'
-    # df = read_csv(file)
-    read_csv_lines(file)
-    print('read csv file...')
-    # stat_analysis(df)
-    print('finished analysis.')
+
+    if commits_list:
+        split_commits(file, commits_list)
+        for commit_hash in commits_list:
+            i = commits_list.index(commit_hash)
+            f = str(i) + '.csv'
+            print(str(f))
+            df = read_csv(f)
+            print(df.head())
+            print('read csv file...')
+            stat_analysis(df, commit_hash + '_merged.csv')
+            print('finished analysis.')
+    else:
+        df = read_csv(file)
+        print('read csv file...')
+        # stat_analysis(df, 'merged.csv')
+        print('finished analysis.')
+
+
+
 
 
 if __name__ == "__main__":
