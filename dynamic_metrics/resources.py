@@ -1,3 +1,4 @@
+import csv
 from functools import reduce
 
 import pandas as pd
@@ -24,6 +25,11 @@ def read_csv(file):
     df = pd.read_csv(file, names=cols, sep=';', header=None)
     return df
 
+def read_csv_lines(file):
+    with open(file, 'r') as csvfile:
+        datareader = csv.reader(csvfile)
+        for row in datareader:
+            print(row)
 
 def stat_analysis(df):
 
@@ -62,9 +68,10 @@ def stat_analysis(df):
 def main():
     print('starting...')
     file = '/mnt/sda4/resources.csv'
-    df = read_csv(file)
+    # df = read_csv(file)
+    read_csv_lines(file)
     print('read csv file...')
-    stat_analysis(df)
+    # stat_analysis(df)
     print('finished analysis.')
 
 
