@@ -60,9 +60,12 @@ def stat_analysis(df):
 
 
 def main():
-    file = 'data/resources.csv'
+    print('starting...')
+    file = '/mnt/sda4/resources.csv'
     df = read_csv(file)
+    print('read csv file...')
     stat_analysis(df)
+    print('finished analysis.')
 
 
 if __name__ == "__main__":
