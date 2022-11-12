@@ -1,4 +1,7 @@
 # summarize the number of unique values for each column using numpy
+import datetime
+
+import numpy as np
 import pandas as pd
 from numpy import loadtxt, percentile, nan
 from numpy import unique
@@ -14,7 +17,10 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
                 'refactoring': ['class_name', 'commit_hash', 'projectName'],
                 'und': ['Kind', 'Name' ,'File', 'commit_hash', 'project_name'],
                 'changedistiller': ['PROJECT_NAME', 'CURRENT_COMMIT', 'PREVIOUS_COMMIT', 'CLASS_CURRENTCOMMIT', 'CLASS_PREVIOUSCOMMIT'],
-                'perform': ['class_name', 'method_name', 'commit_hash', 'committer_date_x']}
+                'perform': ['class_name', 'method_name', 'commit_hash', 'committer_date_x'],
+                'res_avg': ['method_id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
+                       'method_started_at', 'method_ended_at', 'methods.caller_id']
+                }
 ######################################################
 # local = True
 # if local:
@@ -25,7 +31,11 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 metrics = ['perform']
 
 
-def prepare_understand_dataset():
+# def prepare_understand_dataset():
+# metrics = ['res_avg']
+
+
+def format_understand():
     und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
                    "AvgCyclomatic", "AvgCyclomaticModified", "AvgCyclomaticStrict",
                    "AvgEssential", "AvgLine", "AvgLineBlank", "AvgLineCode", "AvgLineComment", "CountClassBase",
@@ -45,36 +55,64 @@ def prepare_understand_dataset():
     df = df[df.columns[7:]]
     return df
 
+def format_resources_avg():
+    res_avg_metrics = ['method_id', 'committer_date', 'commit_hash', 'run', 'class_name', 'method_name',
+                       'method_started_at', 'method_ended_at', 'caller_id', 'own_duration', 'cumulative_duration',
+                       'AVG(active)', 'AVG(available)', 'AVG(buffers)', 'AVG(cached) ', 'AVG(child_major_faults)',
+                       'AVG(child_minor_faults)', 'AVG(commit_limit)', 'AVG(committed_as)', 'AVG(cpu_percent)',
+                       'AVG(data)', 'AVG(dirty)', 'AVG(free)', 'AVG(high_free)', 'AVG(high_total)', 'AVG(huge_pages_total)',
+                       'AVG(huge_pages_free)', 'AVG(huge_pages_total_copy)', 'AVG(hwm)', 'AVG(inactive)', 'AVG(laundry)',
+                       'AVG(load1)', 'AVG(load5)', 'AVG(load15)', 'AVG(locked)', 'AVG(low_free)', 'AVG(low_total)',
+                       'AVG(major_faults)', 'AVG(mapped)', 'AVG(mem_percent)', 'AVG(minor_faults)', 'AVG(page_tables)',
+                       'AVG(pg_fault)', 'AVG(pg_in)', 'AVG(pg_maj_faults)', 'AVG(pg_out)', 'AVG(read_bytes)',
+                       'AVG(read_count)', 'AVG(rss)', 'AVG(shared)', 'AVG(sin)', 'AVG(slab)', 'AVG(sout)',
+                       'AVG(sreclaimable)', 'AVG(stack)', 'AVG(sunreclaim)', 'AVG(swap)', 'AVG(swap_cached)',
+                       'AVG(swap_free)', 'AVG(swap_total)', 'AVG(swap_used)', 'AVG(swap_used_percent) ', 'AVG(total)',
+                       'AVG(used)', 'AVG(used_percent)', 'AVG(vm_s)', 'AVG(vmalloc_chunk)', 'AVG(vmalloc_total)',
+                       'AVG(vmalloc_used)', 'AVG(wired)', 'AVG(write_back)', 'AVG(write_back_tmp)', 'AVG(write_bytes)',
+                       'AVG(write_count)']
+
+    #res_avg_types = {‘a’: np.float64, ‘b’: np.int32, ‘c’: ‘Int64’}
+    res_avg_types = {'method_id': int,'committer_date': str,'commit_hash': str,'run': int,'class_name': str,'method_name': str,
+                       'method_started_at': str,'method_ended_at': str,'caller_id': str,'own_duration': float,'cumulative_duration':float,
+                       'AVG(active)': float,'AVG(available)': float,'AVG(buffers)': float,'AVG(cached) ': float,'AVG(child_major_faults)': float,
+                       'AVG(child_minor_faults)': float,'AVG(commit_limit)': float,'AVG(committed_as)': float,'AVG(cpu_percent)': float,
+                       'AVG(data)': float,'AVG(dirty)': float,'AVG(free)': float,'AVG(high_free)': float,'AVG(high_total)': float,'AVG(huge_pages_total)': float,
+                       'AVG(huge_pages_free)': float,'AVG(huge_pages_total_copy)': float,'AVG(hwm)': float,'AVG(inactive)': float,'AVG(laundry)': float,
+                       'AVG(load1)': float,'AVG(load5)': float,'AVG(load15)': float,'AVG(locked)': float,'AVG(low_free)': float,'AVG(low_total)': float,
+                       'AVG(major_faults)': float,'AVG(mapped)': float,'AVG(mem_percent)': float,'AVG(minor_faults)': float,'AVG(page_tables)': float,
+                       'AVG(pg_fault)': float,'AVG(pg_in)': float,'AVG(pg_maj_faults)': float,'AVG(pg_out)': float,'AVG(read_bytes)': float,
+                       'AVG(read_count)': float,'AVG(rss)': float,'AVG(shared)': float,'AVG(sin)': float,'AVG(slab)': float,'AVG(sout)': float,
+                       'AVG(sreclaimable)': float,'AVG(stack)': float,'AVG(sunreclaim)': float,'AVG(swap)': float,'AVG(swap_cached)': float,
+                       'AVG(swap_free)': float,'AVG(swap_total)': float,'AVG(swap_used)': float,'AVG(swap_used_percent) ': float,'AVG(total)': float,
+                       'AVG(used)': float,'AVG(used_percent)': float,'AVG(vm_s)': float,'AVG(vmalloc_chunk)': float,'AVG(vmalloc_total)': float,
+                       'AVG(vmalloc_used)': float,'AVG(wired)': float,'AVG(write_back)': float,'AVG(write_back_tmp)': float,'AVG(write_bytes)': float}
+
+    df = pd.read_csv('res_avg.csv', sep=';', names=res_avg_metrics, dtype=res_avg_types)
+    return df
 
 for metric in metrics:
     print('reading dataset: ' + metric)
-    if not metric == 'und':
-
-        df = pd.read_csv('results/' + metric + '_all.csv')
+    if metric == 'und':
+        df = format_understand()
+    elif metric == 'res_avg':
+        df = format_resources_avg()
     else:
-        df = prepare_understand_dataset()
+#         df = prepare_understand_dataset()
+        df = pd.read_csv('results/' + metric + '_all.csv')
+
 
     # summarize the dataset
     df.describe().to_csv(metric + '_describe.csv')
 
     # summarize the number of unique values in each column (1%)
     with open("results/variability_" + metric + ".csv", "w") as file1:
-        # Writing data to a file
-        # file1.write("Hello \n")
-        # file1.writelines(L)
-
-        # df_class = df[:, 'cbo_x':'logStatementsQty_x']
-        # print(df_class.head())
         for i in range(df.shape[1]):
             if not df.columns[i] in ignored_cols[metric]:
-                print(df.columns[i])
                 num = len(unique(df.iloc[:, i]))
                 percentage = float(num) / df.shape[0] * 100
                 if percentage < 1.0:
-                    # print('%s, %d, %.2f%%' % (df.columns[i], num, percentage))
                     file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
-
-
 
     # removing columns with low variance
     # get number of unique values for each column
