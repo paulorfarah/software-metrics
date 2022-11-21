@@ -28,7 +28,11 @@ ignored_cols = {'ck': ['file', 'class', 'type', 'method', 'constructor', 'commit
 #     df = pd.read_csv('results/ck_all_100.csv')
 #######################################################
 # metrics = ['ck', 'evometrics', 'organic', 'refactoring', 'und', 'changedistiller']
-metrics = ['res_avg']
+metrics = ['perform']
+
+
+# def prepare_understand_dataset():
+# metrics = ['res_avg']
 
 
 def format_understand():
@@ -94,6 +98,7 @@ for metric in metrics:
     elif metric == 'res_avg':
         df = format_resources_avg()
     else:
+#         df = prepare_understand_dataset()
         df = pd.read_csv('results/' + metric + '_all.csv')
 
 
