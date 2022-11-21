@@ -223,7 +223,7 @@ def join_all_metrics():
                             sep=',', index_col=False)
 
     df_all = pd.merge(left=df_all, right=cd_values, left_on=['project_name', 'commit_hash', 'class'],
-                      right_on=['PROJECT_NAME', 'CURRENT_COMMIT', 'CLASS_CURRENTCOMMIT'], how='outer')
+                      right_on=['PROJECT_NAME', 'PREVIOUS_COMMIT', 'CLASS_PREVIOUSCOMMIT'], how='outer')
 
     df_all.to_csv('results/static_features_cd.csv', sep=',', index=False)
 
