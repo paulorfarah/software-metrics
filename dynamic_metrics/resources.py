@@ -60,7 +60,7 @@ def stat_analysis(df):
 
 
 def main():
-    file = 'data/resources.csv'
+    file = '/mnt/sda4/resources.csv'
     df = read_csv(file)
     stat_analysis(df)
 
