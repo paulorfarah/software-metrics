@@ -114,11 +114,24 @@ def student_ttest_by_method(file, versions):
 
                 if values2.any():
                     # print('values2: ', values2)
-                    stat, pvalue = ttest_ind(values1, values2)
+                    try:
+                        stat, pvalue = ttest_ind(values1, values2)
+                    except ZeroDivisionError:
+                        stat = 0
+                        pvalue = 0
                     if pvalue <= 0.05:
-                        avg1 = sum(values1) / len(values1)
-                        avg2 = sum(values2) / len(values2)
-                        change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
+                        try:
+                            avg1 = sum(values1) / len(values1)
+                        except ZeroDivisionError:
+                            avg1 = 0
+                        try:
+                            avg2 = sum(values2) / len(values2)
+                        except ZeroDivisionError:
+                            avg2 = 0
+                        try:
+                            change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
+                        except ZeroDivisionError:
+                            change = 100
                         df_res.loc[len(df_res.index)] = [versions[v1], versions[v2], name[1], name[2], metric, stat,
                                                          pvalue, avg1, avg2, change]
     df_res.to_csv('results/changes.csv', index=False)
