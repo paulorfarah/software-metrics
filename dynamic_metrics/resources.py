@@ -118,7 +118,7 @@ def student_ttest_by_method(file, versions):
                     if pvalue <= 0.05:
                         avg1 = sum(values1) / len(values1)
                         avg2 = sum(values2) / len(values2)
-                        change = round((((avg2 - avg1) / avg1) * 100), 2)
+                        change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
                         df_res.loc[len(df_res.index)] = [versions[v1], versions[v2], name[1], name[2], metric, stat,
                                                          pvalue, avg1, avg2, change]
     df_res.to_csv('results/changes.csv', index=False)
@@ -134,17 +134,11 @@ def compare_versions(v1, v2):
 
 def main(commits_file):
     print('starting...')
-    # commits_list = None
-    # commits_list = ['1a01c13b73c0c66de1efa3db4d73a839aaf20ab9', '266c64660523d728592e646fa9f3f3e2fdfdbc4a',
-    #                 'caf80a128f00481e8c19151257001015acc3e76e', 'a6e7c7e6fc54c8ee3dce10edbe76c1821f10cd92',
-    #                 '0c45595df8f8a0939dbc0b0385c8afe7502b1190', '853c1e35326a54e3fc28177c5c84c07652750140',
-    #                 '3506ccdfa91500016e3a0908d7ccabc171aa5602', '22ade6817ad07f22f1d8f0263ff6ddc6fc9b05db',
-    #                 '36782213bf5e8f1e0f601cb73774ec7a5a8c58f1']
-    # commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
-    commits_list = []
-    with open(args.commits) as f:
-        commits_list = f.read().splitlines()
-        commits_list.reverse()
+    # commits_list = []
+    # with open(args.commits) as f:
+    #     commits_list = f.read().splitlines()
+    #     commits_list.reverse()
+    commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
 
 
     # file = '/mnt/sda4/resources.csv'
@@ -167,6 +161,6 @@ def main(commits_file):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description='evaluate resources')
-    ap.add_argument('--commits', required=True, help='csv with a list of commits (newer to oldest) to compare commitA and commitB')
+    ap.add_argument('--commits', required=False, help='csv with a list of commits (newer to oldest) to compare commitA and commitB')
     args = ap.parse_args()
     main(args.commits)
