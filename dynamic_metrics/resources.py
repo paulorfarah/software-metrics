@@ -1,4 +1,5 @@
 import argparse
+import collections
 import csv
 import sys
 from functools import reduce
@@ -115,7 +116,11 @@ def student_ttest_by_method(file, versions):
                 if values2.any():
                     # print('values2: ', values2)
                     try:
-                        stat, pvalue = ttest_ind(values1, values2)
+                        if isinstance(values1, collections.abc.Sequence) and isinstance(values2, collections.abc.Sequence):
+                            stat, pvalue = ttest_ind(values1, values2)
+                        else:
+                            stat = -1
+                            pvalue = -1
                     except ZeroDivisionError:
                         stat = 0
                         pvalue = 0
