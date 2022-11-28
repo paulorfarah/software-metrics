@@ -114,7 +114,7 @@ def student_ttest_by_method(file, versions):
                                  (df['method_name'] == name[2])][metric]
 
                 if values2.any():
-                    # print('values2: ', values2)
+                    print('values2: ', values2)
                     try:
                         if isinstance(values1, collections.abc.Sequence) and isinstance(values2, collections.abc.Sequence):
                             stat, pvalue = ttest_ind(values1, values2)
@@ -129,10 +129,16 @@ def student_ttest_by_method(file, versions):
                             avg1 = sum(values1) / len(values1)
                         except ZeroDivisionError:
                             avg1 = 0
+                        except:
+                            print('values1: ', values1)
+                            print('error: ', sys.exc_info())
                         try:
                             avg2 = sum(values2) / len(values2)
                         except ZeroDivisionError:
                             avg2 = 0
+                        except:
+                            print('values2: ', values2)
+                            print('error: ', sys.exc_info())
                         try:
                             change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
                         except ZeroDivisionError:
