@@ -91,17 +91,20 @@ def split_commits(file, commit_list, delimiter=';', quotechar='"'):
         datareader = csv.reader(csvfile, delimiter=delimiter, quotechar=quotechar)
         for r in datareader:
             commit_hash = r[2]
-            i = commit_list.index(commit_hash)
-            if r:
-                # f[i].write("\"")
-                string = '; '.join(r)
-                for item in string:
-                    f[i].write(item)
-                    f[i].flush()
-                # f[i].write("\"")
-                f[i].write("\n")
+            if commit_hash in commit_list:
+                i = commit_list.index(commit_hash)
+                if r:
+                    # f[i].write("\"")
+                    string = '; '.join(r)
+                    for item in string:
+                        f[i].write(item)
+                        f[i].flush()
+                    # f[i].write("\"")
+                    f[i].write("\n")
+                else:
+                    print('not r')
             else:
-                print('not r')
+                print('ATTENTION: Commit not in list: ' + commit_hash)
 
     for i in range(len(commit_list)):
         f[i].close()
