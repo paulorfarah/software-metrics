@@ -38,7 +38,7 @@ def read_csv(file):
             'swap_used_percent':float, 'total':int, 'used':int, 'used_percent':float, 'vm_s':int, 'vmalloc_chunk':int,
             'vmalloc_total': int, 'vmalloc_used':int, 'wired':int, 'write_back':int, 'write_back_tmp':int,
             'write_bytes':int, 'write_count':int}
-    df = pd.read_csv(file, names=cols, sep=';', header=None, dtype=cols_type)
+    df = pd.read_csv(file, names=cols, sep=';', dtype=cols_type)
     return df
 
 def main():
