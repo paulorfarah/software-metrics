@@ -3,6 +3,7 @@ import collections
 import csv
 import sys
 from functools import reduce
+from threading import Thread
 
 import pandas as pd
 from scipy.stats import ttest_ind
@@ -118,7 +119,8 @@ def split_commits(file, commit_list, delimiter=';', quotechar='"'):
 #             f.write(item)
 #     f.write('\n')
 
-def stat_analysis(df, output):
+def stat_analysis(f, output):
+    df = read_csv(f)
     df_merged = df.groupby(['commit_hash', 'class_name', 'method_name'])[val_cols].describe().reset_index()
     df_merged.columns = [f'{i}_{j}' for i, j in df_merged.columns]
     #
@@ -213,7 +215,7 @@ def main(commits_file):
     #     commits_list.reverse()
 
     # local
-    file = 'data/jvms.csv'
+    file = '../data/jvms.csv'
     commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
 
     if commits_list:
@@ -221,12 +223,15 @@ def main(commits_file):
         for commit_hash in commits_list:
             i = commits_list.index(commit_hash)
             f = 'results/' + commit_hash + "_jvm.csv"
-            df = read_csv(f)
-            stat_analysis(df, 'results/' + commit_hash + '_jvm_stats.csv')
+
+            out = 'results/' + commit_hash + '_jvm_stats.csv'
+            thread = Thread(target=stat_analysis, args=(f, out))
+            thread.start()
     else:
-        df = read_csv(file)
-        stat_analysis(df, 'results/jvm_stats.csv')
-    print('finished jvm analysis.')
+        out = 'results/jvm_stats.csv'
+        thread = Thread(target=stat_analysis, args=(file, out))
+        thread.start()
+    # print('finished jvm analysis.')
 
     student_ttest_by_method(file, commits_list)
 

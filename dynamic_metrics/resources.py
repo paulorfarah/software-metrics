@@ -166,7 +166,7 @@ def main(commits_file):
 
 
     # file = '/mnt/sda4/resources.csv'
-    file = 'data/resources.csv'
+    file = '../data/resources.csv'
     if commits_list:
         split_commits(file, commits_list)
         for commit_hash in commits_list:

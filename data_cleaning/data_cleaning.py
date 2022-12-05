@@ -51,7 +51,7 @@ def format_understand():
                    "MaxNesting", "PercentLackOfCohesion", "RatioCommentToCode", "SumCyclomatic",
                    "SumCyclomaticModified", "SumCyclomaticStrict", "SumEssential", 'unknown', 'commit_hash',
                    'project_name']
-    df = pd.read_csv('results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
+    df = pd.read_csv('../results/und_all.csv', sep=',', engine='python', names=und_metrics, skiprows=1)
     df = df[df.columns[7:]]
     return df
 
@@ -111,8 +111,8 @@ for metric in metrics:
             if not df.columns[i] in ignored_cols[metric]:
                 num = len(unique(df.iloc[:, i]))
                 percentage = float(num) / df.shape[0] * 100
-                if percentage < 1.0:
-                    file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
+                # if percentage < 1.0:
+                file1.write('%s, %d, %.1f%%\n' % (df.columns[i], num, percentage))
 
     # removing columns with low variance
     # get number of unique values for each column
