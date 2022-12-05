@@ -42,11 +42,15 @@ def read_csv(file):
 def main():
     print('starting...')
     metric = 'resources'
-    f = '../data/resources.csv'
+    f = '/mnt/sda4/resources-csv-1-header.csv'
     df = read_csv(f)
+    for v in df['own_duration'].values:
+        if type(v) == 'str':
+            print(v)
     with open("results/variability_" + metric + ".csv", "w") as file1:
         for i in range(df.shape[1]):
             if not df.columns[i] in ignored_cols[metric]:
+                print('cols: ' + df.columns[i])
                 num = len(unique(df.iloc[:, i]))
                 percentage = float(num) / df.shape[0] * 100
                 # if percentage < 1.0:
