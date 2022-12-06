@@ -23,7 +23,7 @@ def read_csv(file):
             'write_back', 'write_back_tmp', 'write_bytes', 'write_count']
     cols_type = {'methods.id':int, 'committer_date':str, 'commit_hash': str, 'run': int, 'class_name':str,
             'method_name':str, 'method_started_at':str, 'method_ended_at':str,
-            'caller_id':int, 'own_duration':float, 'cumulative_duration':float, 'active':int, 'available':int, 'buffers':int,
+            'caller_id':str, 'own_duration':float, 'cumulative_duration':float, 'active':int, 'available':int, 'buffers':int,
                 'cached': int, 'child_major_faults':int, 'child_minor_faults':int, 'commit_limit':int,
             'committed_as': int, 'cpu_percent':float, 'data':int, 'dirty':int, 'free':int, 'high_free':int, 'high_total':int, 'huge_pages_total':int,
             'huge_pages_free':int,
@@ -33,7 +33,7 @@ def read_csv(file):
             'mapped':int, 'mem_percent':float, 'minor_faults':int, 'page_tables':int, 'pg_fault':int, 'pg_in':int,
             'pg_maj_faults':int, 'pg_out': int,
             'read_bytes':int, 'read_count':int,
-            'rss':int, 'shared':int, 'sin':int, 'slab':int, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':int,
+            'rss':int, 'shared':int, 'sin':float, 'slab':int, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':int,
             'swap': int, 'swap_cached':int, 'swap_free':int, 'swap_total':int, 'swap_used':int,
             'swap_used_percent':float, 'total':int, 'used':int, 'used_percent':float, 'vm_s':int, 'vmalloc_chunk':int,
             'vmalloc_total': int, 'vmalloc_used':int, 'wired':int, 'write_back':int, 'write_back_tmp':int,
