@@ -23,21 +23,21 @@ def read_csv(file):
             'write_back', 'write_back_tmp', 'write_bytes', 'write_count']
     cols_type = {'methods.id':int, 'committer_date':str, 'commit_hash': str, 'run': int, 'class_name':str,
             'method_name':str, 'method_started_at':str, 'method_ended_at':str,
-            'caller_id':int, 'own_duration':float, 'cumulative_duration':float, 'active':int, 'available':int, 'buffers':int,
+            'caller_id':str, 'own_duration':float, 'cumulative_duration':float, 'active':float, 'available':float, 'buffers':int,
                 'cached': int, 'child_major_faults':int, 'child_minor_faults':int, 'commit_limit':int,
-            'committed_as': int, 'cpu_percent':float, 'data':int, 'dirty':int, 'free':int, 'high_free':int, 'high_total':int, 'huge_pages_total':int,
+            'committed_as': float, 'cpu_percent':float, 'data':int, 'dirty':float, 'free':float, 'high_free':int, 'high_total':int, 'huge_pages_total':int,
             'huge_pages_free':int,
-            'huge_pages_total1':int, 'hwm':int, 'inactive':int, 'laundry':int, 'load1':float, 'load5':float, 'load15':float,
-                 'locked':int, 'low_free':int,
+            'huge_pages_total1':int, 'hwm':int, 'inactive':float, 'laundry':int, 'load1':float, 'load5':float, 'load15':float,
+                 'locked':float, 'low_free':int,
             'low_total':int, 'major_faults':int,
-            'mapped':int, 'mem_percent':float, 'minor_faults':int, 'page_tables':int, 'pg_fault':int, 'pg_in':int,
+            'mapped':float, 'mem_percent':float, 'minor_faults':float, 'page_tables':float, 'pg_fault':int, 'pg_in':int,
             'pg_maj_faults':int, 'pg_out': int,
-            'read_bytes':int, 'read_count':int,
-            'rss':int, 'shared':int, 'sin':int, 'slab':int, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':int,
+            'read_bytes':int, 'read_count':float,
+            'rss':float, 'shared':int, 'sin':int, 'slab':int, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':int,
             'swap': int, 'swap_cached':int, 'swap_free':int, 'swap_total':int, 'swap_used':int,
-            'swap_used_percent':float, 'total':int, 'used':int, 'used_percent':float, 'vm_s':int, 'vmalloc_chunk':int,
-            'vmalloc_total': int, 'vmalloc_used':int, 'wired':int, 'write_back':int, 'write_back_tmp':int,
-            'write_bytes':int, 'write_count':int}
+            'swap_used_percent':float, 'total':int, 'used':float, 'used_percent':float, 'vm_s':float, 'vmalloc_chunk':float,
+            'vmalloc_total': float, 'vmalloc_used':float, 'wired':float, 'write_back':float, 'write_back_tmp':float,
+            'write_bytes':float, 'write_count':float}
     df = pd.read_csv(file, names=cols, sep=';', dtype=cols_type)
     return df
 
@@ -46,6 +46,7 @@ def main():
     metric = 'resources'
     f = '/mnt/sda4/resources-csv-1-header.csv'
     df = read_csv(f)
+    print(df.head())
     for v in df['own_duration'].values:
         if type(v) == 'str':
             print(v)
