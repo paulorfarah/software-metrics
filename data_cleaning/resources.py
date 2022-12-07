@@ -33,7 +33,7 @@ def read_csv(file):
             'mapped':float, 'mem_percent':float, 'minor_faults':float, 'page_tables':float, 'pg_fault':int, 'pg_in':int,
             'pg_maj_faults':int, 'pg_out': int,
             'read_bytes':int, 'read_count':float,
-            'rss':float, 'shared':int, 'sin':float, 'slab':float, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':int,
+            'rss':float, 'shared':int, 'sin':float, 'slab':float, 'sout':int, 'sreclaimable':int, 'stack':int, 'sunreclaim':float,
             'swap': int, 'swap_cached':int, 'swap_free':int, 'swap_total':int, 'swap_used':int,
             'swap_used_percent':float, 'total':int, 'used':float, 'used_percent':float, 'vm_s':float, 'vmalloc_chunk':float,
             'vmalloc_total': float, 'vmalloc_used':float, 'wired':float, 'write_back':float, 'write_back_tmp':float,
