@@ -8,7 +8,7 @@ ignored_cols = {'resources': ['methods.id', 'committer_date', 'commit_hash', 'ru
 def read_csv(file):
     cols = ['methods.id', 'committer_date', 'commit_hash', 'run', 'class_name',
             'method_name', 'method_started_at', 'method_ended_at',
-            'caller_id', 'own_duration', 'cumulative_duration', 'active', 'available', 'buffers', 'cached ',
+            'caller_id', 'own_duration', 'cumulative_duration', 'timestamp', 'active', 'available', 'buffers', 'cached ',
             'child_major_faults', 'child_minor_faults', 'commit_limit',
             'committed_as', 'cpu_percent', 'data', 'dirty', 'free', 'high_free', 'high_total', 'huge_pages_total',
             'huge_pages_free',
@@ -23,7 +23,7 @@ def read_csv(file):
             'write_back', 'write_back_tmp', 'write_bytes', 'write_count']
     cols_type = {'methods.id':int, 'committer_date':str, 'commit_hash': str, 'run': int, 'class_name':str,
             'method_name':str, 'method_started_at':str, 'method_ended_at':str,
-            'caller_id':str, 'own_duration':float, 'cumulative_duration':float, 'active':float, 'available':float, 'buffers':float,
+            'caller_id':str, 'own_duration':float, 'cumulative_duration':float, 'timestamp':str, 'active':float, 'available':float, 'buffers':float,
             'cached': float, 'child_major_faults':float, 'child_minor_faults':float, 'commit_limit':float,
             'committed_as': float, 'cpu_percent':float, 'data':float, 'dirty':float, 'free':float, 'high_free':float, 'high_total':float, 'huge_pages_total':float,
             'huge_pages_free':float,
