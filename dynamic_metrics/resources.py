@@ -110,12 +110,12 @@ def student_ttest_by_method(file, versions):
             rows = grouped1[metric]
 
             for name, values1 in rows:
-                print(len(values1))
-                for i in values1:
-                    print(i, type(i))
+                # print(len(values1))
+                # for i in values1:
+                #     print(i, type(i))
                 vals1 = values1
                 try:
-                    print('1->', values1.iloc[0])
+                    # print('1->', values1.iloc[0])
                     if type(values1.iloc[0]) is str:
                         vals1 = [eval(i) for i in values1]
                 except:
@@ -130,7 +130,7 @@ def student_ttest_by_method(file, versions):
                     # print1
                     vals2 = values2
                     try:
-                        print('2->', values2.iloc[0])
+                        # print('2->', values2.iloc[0])
                         if type(values2.iloc[0]) is str:
                             vals2 = [eval(i) for i in values2]
                     except:
@@ -185,15 +185,15 @@ def compare_versions(v1, v2):
 
 def main(commits_file):
     print('starting...')
-    # commits_list = []
-    # with open(args.commits) as f:
-    #     commits_list = f.read().splitlines()
-    #     commits_list.reverse()
-    commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
+    commits_list = []
+    with open(args.commits) as f:
+        commits_list = f.read().splitlines()
+        commits_list.reverse()
+    # commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
 
 
-    # file = '/mnt/sda4/resources.csv'
-    file = '../data/resources.csv'
+    file = '/mnt/sda4/resources.csv'
+    # file = '../data/resources.csv'
     # stat_between_commits(commits_list, file)
 
     student_ttest_by_method(file, commits_list)
