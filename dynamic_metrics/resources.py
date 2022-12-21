@@ -106,42 +106,69 @@ def student_ttest_by_method(file, versions):
         grouped1 = df1[val_cols].groupby(['commit_hash', 'class_name', 'method_name'])
 
         for metric in val_cols[3:]:
-            row = grouped1[metric]
+            print("---------------- " + metric + " -------------------------")
+            rows = grouped1[metric]
 
-            for name, values1 in row:
+            for name, values1 in rows:
+                # print(len(values1))
+                # for i in values1:
+                #     print(i, type(i))
+                vals1 = values1
+                try:
+                    # print('1->', values1.iloc[0])
+                    if type(values1.iloc[0]) is str:
+                        vals1 = [eval(i) for i in values1]
+                except:
+                    print(sys.exc_info())
+                    print('values1 empty')
+                    print(values1)
                 values2 = df.loc[(df['commit_hash'] == versions[v2]) &
                                  (df['class_name'] == name[1]) &
                                  (df['method_name'] == name[2])][metric]
 
                 if values2.any():
-                    print('values2: ', values2)
+                    # print1
+                    vals2 = values2
                     try:
-                        if isinstance(values1, collections.abc.Sequence) and isinstance(values2, collections.abc.Sequence):
-                            stat, pvalue = ttest_ind(values1, values2)
+                        # print('2->', values2.iloc[0])
+                        if type(values2.iloc[0]) is str:
+                            vals2 = [eval(i) for i in values2]
+                    except:
+                        print(sys.exc_info())
+                        print('values2 empty')
+                        print(values1)
+                    try:
+                        if isinstance(vals1, collections.abc.Sequence) and isinstance(vals2, collections.abc.Sequence):
+                            stat, pvalue = ttest_ind(vals1, vals2)
                         else:
                             stat = -1
                             pvalue = -1
                     except ZeroDivisionError:
+                        print('ZeroDivisionError1: ', vals1, vals2)
                         stat = 0
                         pvalue = 0
                     if pvalue <= 0.05:
                         try:
-                            avg1 = sum(values1) / len(values1)
+                            avg1 = sum(vals1) / len(vals1)
                         except ZeroDivisionError:
+                            print('ZeroDivisionError2: ', vals1)
                             avg1 = 0
                         except:
-                            print('values1: ', values1)
-                            print('error: ', sys.exc_info())
+                            print('error1: ', sys.exc_info())
+                            print('vals1: ', len(vals1))
                         try:
-                            avg2 = sum(values2) / len(values2)
+                            avg2 = sum(vals2) / len(vals2)
                         except ZeroDivisionError:
+                            print('ZeroDivisionError3: ', vals2)
                             avg2 = 0
                         except:
-                            print('values2: ', values2)
-                            print('error: ', sys.exc_info())
+                            print('error2: ', sys.exc_info())
+                            print('vals2: ', vals2)
+
                         try:
                             change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
                         except ZeroDivisionError:
+                            print('ZeroDivisionError4: ', avg1)
                             change = 100
                         df_res.loc[len(df_res.index)] = [versions[v1], versions[v2], name[1], name[2], metric, stat,
                                                          pvalue, avg1, avg2, change]
@@ -158,15 +185,21 @@ def compare_versions(v1, v2):
 
 def main(commits_file):
     print('starting...')
-    # commits_list = []
-    # with open(args.commits) as f:
-    #     commits_list = f.read().splitlines()
-    #     commits_list.reverse()
-    commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
+    commits_list = []
+    with open(args.commits) as f:
+        commits_list = f.read().splitlines()
+        commits_list.reverse()
+    # commits_list = ['f38847e90714fbefc33042912d1282cc4fb7d43e', 'f38847e90714fbefc33042912d1282cc4fb7d43f']
 
 
-    # file = '/mnt/sda4/resources.csv'
-    file = '../data/resources.csv'
+    file = '/mnt/sda4/resources.csv'
+    # file = '../data/resources.csv'
+    # stat_between_commits(commits_list, file)
+
+    student_ttest_by_method(file, commits_list)
+
+
+def stat_between_commits(commits_list, file):
     if commits_list:
         split_commits(file, commits_list)
         for commit_hash in commits_list:
@@ -178,9 +211,6 @@ def main(commits_file):
         df = read_csv(file)
         stat_analysis(df, 'results/merged.csv')
     print('finished analysis.')
-
-    student_ttest_by_method(file, commits_list)
-
 
 
 if __name__ == "__main__":
