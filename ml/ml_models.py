@@ -1,13 +1,21 @@
+from collections import Counter
+from copy import deepcopy
+
+import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt, pyplot
-from numpy import mean, std, array
+from numpy import mean, std, array, isnan, where
 from sklearn import metrics
 from sklearn.ensemble import RandomForestClassifier, HistGradientBoostingClassifier
+from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import accuracy_score
-from sklearn.model_selection import RepeatedStratifiedKFold, cross_val_score, train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, f1_score, roc_auc_score
+from sklearn.model_selection import RepeatedStratifiedKFold, cross_val_score, train_test_split, GridSearchCV
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import MinMaxScaler, LabelEncoder
+import xgboost as xgb
+from xgboost import XGBClassifier
 
 pd.set_option('display.max_columns', None)
 
@@ -98,25 +106,25 @@ def knearest_neighbor(dataset):
     # roc_auc = metrics.roc_auc_score(y_test, yhat)
     # print('roc_auc: %.3f' % (roc_auc * 100))
 
-def logistic_regression(dataset):
+def logistic_regression(X_train, X_test, y_train, y_test):
     print('logistic regression')
-    data = dataset.values
-    X, y = data[:, 3:22], data[:, -1]
-
-    # ensure inputs are floats and output is an integer label
-    X = X.astype('float32')
-    y = LabelEncoder().fit_transform(y.astype('int'))
-
-    # split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
-    # define the scaler
-    scaler = MinMaxScaler()
-    # fit on the training dataset
-    scaler.fit(X_train)
-    # scale the training dataset
-    X_train = scaler.transform(X_train)
-    # scale the test dataset
-    X_test = scaler.transform(X_test)
+    # data = dataset.values
+    # X, y = data[:, 3:22], data[:, -1]
+    #
+    # # ensure inputs are floats and output is an integer label
+    # X = X.astype('float32')
+    # y = LabelEncoder().fit_transform(y.astype('int'))
+    #
+    # # split into train and test sets
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
+    # # define the scaler
+    # scaler = MinMaxScaler()
+    # # fit on the training dataset
+    # scaler.fit(X_train)
+    # # scale the training dataset
+    # X_train = scaler.transform(X_train)
+    # # scale the test dataset
+    # X_test = scaler.transform(X_test)
     # fit the model
     model = LogisticRegression()
     model.fit(X_train, y_train)
@@ -138,25 +146,25 @@ def logistic_regression(dataset):
     roc_auc = metrics.roc_auc_score(y_test, yhat)
     print('roc_auc: %.3f' % (roc_auc * 100))
 
-def random_forest(dataset):
+def random_forest(X_train, X_test, y_train, y_test):
     print('random forest')
-    data = dataset.values
-    X, y = data[:, 3:22], data[:, -1]
-
-    # ensure inputs are floats and output is an integer label
-    X = X.astype('float32')
-    y = LabelEncoder().fit_transform(y.astype('int'))
-
-    # split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
-    # define the scaler
-    scaler = MinMaxScaler()
-    # fit on the training dataset
-    scaler.fit(X_train)
-    # scale the training dataset
-    X_train = scaler.transform(X_train)
-    # scale the test dataset
-    X_test = scaler.transform(X_test)
+    # data = dataset.values
+    # X, y = data[:, 3:22], data[:, -1]
+    #
+    # # ensure inputs are floats and output is an integer label
+    # X = X.astype('float32')
+    # y = LabelEncoder().fit_transform(y.astype('int'))
+    #
+    # # split into train and test sets
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
+    # # define the scaler
+    # scaler = MinMaxScaler()
+    # # fit on the training dataset
+    # scaler.fit(X_train)
+    # # scale the training dataset
+    # X_train = scaler.transform(X_train)
+    # # scale the test dataset
+    # X_test = scaler.transform(X_test)
     # fit the model
     model = RandomForestClassifier(max_depth=2, random_state=0)
     model.fit(X_train, y_train)
@@ -178,17 +186,17 @@ def random_forest(dataset):
     roc_auc = metrics.roc_auc_score(y_test, yhat)
     print('roc_auc: %.3f' % (roc_auc * 100))
 
-def gradient_boosting(dataset):
+def hist_gradient_boosting(X, y):
     print('gradient_boosting')
-    data = dataset.values
-    X, y = data[:, 3:22], data[:, -1]
-
-    # ensure inputs are floats and output is an integer label
-    X = X.astype('float32')
-    y = LabelEncoder().fit_transform(y.astype('int'))
-
+    # data = dataset.values
+    # X, y = data[:, 3:22], data[:, -1]
+    #
+    # # ensure inputs are floats and output is an integer label
+    # X = X.astype('float32')
+    # y = LabelEncoder().fit_transform(y.astype('int'))
+    #
     # split into train and test sets
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=1)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
     # define the scaler
     scaler = MinMaxScaler()
     # fit on the training dataset
@@ -218,6 +226,29 @@ def gradient_boosting(dataset):
     roc_auc = metrics.roc_auc_score(y_test, yhat)
     print('roc_auc: %.3f' % (roc_auc * 100))
 
+def xgboost(X, y):
+    model = XGBClassifier()
+    # define grid
+    weights = [1, 10, 25, 50, 75, 99, 100, 1000]
+    param_grid = dict(scale_pos_weight=weights)
+    # define evaluation procedure
+    cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=3, random_state=1)
+    # define grid search
+    grid = GridSearchCV(estimator=model, param_grid=param_grid, n_jobs=-1, cv=cv, scoring='f1')
+    # execute the grid search
+    grid_result = grid.fit(X, y)
+    # report the best configuration
+    print("Best: %f using %s" % (grid_result.best_score_, grid_result.best_params_))
+    # report all configurations
+    means = grid_result.cv_results_['mean_test_score']
+    stds = grid_result.cv_results_['std_test_score']
+    params = grid_result.cv_results_['params']
+    for mean, stdev, param in zip(means, stds, params):
+        print("%f (%f) with: %r" % (mean, stdev, param))
+
+
+
+
 
 # split a univariate sequence into samples
 def split_sequence(sequence, n_steps):
@@ -236,6 +267,17 @@ def main():
 
     df = read_dataset()
     print(df['changed'].unique())
+
+    # delete duplicate rows
+    df.drop_duplicates(inplace=True)
+
+    # handling missing data
+    # for i in range(df.shape[1]):
+    #     # count number of rows with missing values
+    #     n_miss = df[[i]].isnull().sum()
+    #     perc = n_miss / df.shape[0] * 100
+    #     print('> %d, Missing: %d (%.1f%%)' % (i, n_miss, perc))
+
     # print(df.head())
     #normalize
     # scaler = MinMaxScaler()
@@ -247,10 +289,45 @@ def main():
     fig = df.hist(xlabelsize=4, ylabelsize=4)
     [x.title.set_size(4) for x in fig.ravel()]
     plt.show()
+    data = df.values
+    X, y = data[:, 3:22], data[:, -1]
+
+    # ensure inputs are floats and output is an integer label
+    X = X.astype('float32')
+    y = LabelEncoder().fit_transform(y.astype('int'))
+
+    # summarize class distribution
+    counter = Counter(y)
+    print(counter)
+    # scatter plot of examples by class label
+    for label, _ in counter.items():
+        row_ix = where(y == label)[0]
+        pyplot.scatter(X[row_ix, 0], X[row_ix, 1], label=str(label))
+    pyplot.legend()
+    pyplot.show()
+
+    # evaluate each strategy on the dataset
+    results = list()
+    strategies = ['mean', 'median', 'most_frequent', 'constant']
+    for s in strategies:
+        # create the modeling pipeline
+        pipeline = Pipeline(steps=[('i', SimpleImputer(strategy=s)), ('m',
+                                                                      RandomForestClassifier())])
+        # evaluate the model
+        cv = RepeatedStratifiedKFold(n_splits=10, n_repeats=3, random_state=1)
+        scores = cross_val_score(pipeline, X, y, scoring='f1', cv=cv, n_jobs=-1)
+        # store results
+        results.append(scores)
+        print('>%s %.3f (%.3f)' % (s, mean(scores), std(scores)))
+    # plot model performance for comparison
+    pyplot.boxplot(results, labels=strategies, showmeans=True)
+    pyplot.show()
 
     # knearest_neighbor(df)
     # logistic_regression(df)
     # random_forest(df)
-    gradient_boosting(df)
+    hist_gradient_boosting(X, y)
+    xgboost(X, y)
+
 if __name__ == "__main__":
     main()
