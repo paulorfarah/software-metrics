@@ -8,6 +8,8 @@ import git
 
 
 def runJar(pathA, pathB, currentCommit, previousCommit):
+    print(currentCommit)
+    print(previousCommit)
     filesA = pathA.files()
     filesB = pathB.files()
     filesA = [x for x in filesA if x.endswith('.java')]
@@ -22,12 +24,14 @@ def runJar(pathA, pathB, currentCommit, previousCommit):
         if any(file_temp in s for s in filesB):
             file2 = args.absolutePath + "projectB" + file_temp
             # classPreviousCommit classCurrentCommit csvPath projectName currentCommit previousCommit
+            print('java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar '+ file2 + ' ' + file + ' ' + csvPath)
             subprocess.call(
                 ['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar', file2, file, csvPath,
                  args.projectName, currentCommit, previousCommit])
 
 
 if __name__ == "__main__":
+    print('starting...')
     ap = argparse.ArgumentParser(description='Extractor for changeDistiller')
     ap.add_argument('--pathA', required=True)
     ap.add_argument('--pathB', required=True)
@@ -47,13 +51,14 @@ if __name__ == "__main__":
     i = 0
     commit_A = ''
     commit_B = ''
+    print(args.mode)
     if (args.mode == 'tag'):
         for tag in tags:
             if (i == 0):
                 commit_A = tag
                 i += 1
             else:
-
+                print('else')
                 hashA = pathA.get_commit_from_tag(commit_A.name).hash
                 hashB = pathB.get_commit_from_tag(tag.name).hash
                 pathA.checkout(hashA)
@@ -61,14 +66,22 @@ if __name__ == "__main__":
                 runJar(pathA, pathB, str(hashA), str(hashB))
                 commit_A = tag
     else:
+        print(args.commits)
         i = 0
+        cur_com = ''
+        prev_com = ''
         for line in reversed(list(open(args.commits))):
+            # print(line)
             if i == 0:
-                cur_com = line.rstrip
+                cur_com = line
             else:
                 prev_com = cur_com
-                cur_com = line.rstrip
+                cur_com = line
+                print(prev_com)
+                print(cur_com)
 
                 pathA.checkout(prev_com)
                 pathB.checkout(cur_com)
                 runJar(pathA, pathB, prev_com, cur_com)
+                print('---')
+            i += 1
