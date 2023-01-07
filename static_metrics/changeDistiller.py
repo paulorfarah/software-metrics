@@ -5,13 +5,17 @@ import shutil
 import subprocess
 
 import git
+from pydriller import Repository
 
 
-def runJar(pathA, pathB, currentCommit, previousCommit):
-    print(currentCommit)
-    print(previousCommit)
-    filesA = pathA.files()
-    filesB = pathB.files()
+def runJar(pathA, pathB, hashA, hashB):
+    filesA = None
+    for commitA in  Repository(pathA, single=hashA).traverse_commits():
+        filesA = commitA.files()
+
+    filesB = None
+    for commitB in Repository(pathB, single=hashB).traverse_commits():
+        filesB = commitB.files()
     filesA = [x for x in filesA if x.endswith('.java')]
     filesB = [x for x in filesB if x.endswith('.java')]
     csvPath = args.absolutePath + args.projectName + "-results.csv"
@@ -27,7 +31,7 @@ def runJar(pathA, pathB, currentCommit, previousCommit):
             print('java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + file2 + ' ' + file + ' ' + csvPath)
             subprocess.call(
                 ['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar', file2, file, csvPath,
-                 args.projectName, currentCommit, previousCommit])
+                 args.projectName, hashA, hashB])
 
 
 if __name__ == "__main__":
@@ -82,6 +86,6 @@ if __name__ == "__main__":
 
                 print(cur_com)
                 pathB.checkout(cur_com)
-                runJar(pathA, pathB, prev_com, cur_com)
+                runJar(args.pathA, args.pathB, prev_com, cur_com)
                 print('---')
             i += 1
