@@ -81,11 +81,10 @@ if __name__ == "__main__":
             else:
                 prev_com = cur_com
                 cur_com = line
-                print(prev_com)
-                pathA.checkout(prev_com)
-
-                print(cur_com)
-                pathB.checkout(cur_com)
+                # print(prev_com)
+                # pathA.checkout(prev_com)
+                # print(cur_com)
+                # pathB.checkout(cur_com)
                 runJar(args.pathA, args.pathB, prev_com, cur_com)
                 print('---')
             i += 1
