@@ -78,9 +78,9 @@ if __name__ == "__main__":
                 prev_com = cur_com
                 cur_com = line
                 print(prev_com)
-                print(cur_com)
-
                 pathA.checkout(prev_com)
+
+                print(cur_com)
                 pathB.checkout(cur_com)
                 runJar(pathA, pathB, prev_com, cur_com)
                 print('---')
