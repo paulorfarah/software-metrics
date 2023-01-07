@@ -24,7 +24,7 @@ def runJar(pathA, pathB, currentCommit, previousCommit):
         if any(file_temp in s for s in filesB):
             file2 = args.absolutePath + "projectB" + file_temp
             # classPreviousCommit classCurrentCommit csvPath projectName currentCommit previousCommit
-            print('java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar '+ file2 + ' ' + file + ' ' + csvPath)
+            print('java -jar ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar ' + file2 + ' ' + file + ' ' + csvPath)
             subprocess.call(
                 ['java', '-jar', 'ChangeDistillerReader-0.0.1-SNAPSHOT-jar-with-dependencies.jar', file2, file, csvPath,
                  args.projectName, currentCommit, previousCommit])
