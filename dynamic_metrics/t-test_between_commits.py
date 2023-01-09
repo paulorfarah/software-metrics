@@ -7,6 +7,8 @@ from scipy.stats import ttest_ind
 
 pd.set_option('display.max_columns', None)
 
+projects = ['bcel', 'csv', 'text', 'easymock', 'jgit', 'openfire']
+
 # val_cols = ['commit_hash', 'class_name', 'method_name', 'own_duration', 'cumulative_duration', 'active',
 #             'available', 'buffers', 'cached ', 'child_major_faults', 'child_minor_faults', 'commit_limit',
 #             'committed_as', 'cpu_percent', 'data', 'dirty', 'free', 'high_free', 'high_total', 'huge_pages_total',
@@ -42,7 +44,7 @@ def read_csv(file):
     return df
 
 
-def student_ttest_by_method(file, versions):
+def student_ttest_by_method(project_name, file, versions):
     # https://analyticsindiamag.com/a-beginners-guide-to-students-t-test-in-python-from-scratch%EF%BF%BC/
     # https://stackoverflow.com/questions/13404468/t-test-in-pandas
 
@@ -132,18 +134,64 @@ def student_ttest_by_method(file, versions):
                                                  pvalue, avg1, avg2, change]
                 print([versions[v1], versions[v2], class_name, metric, stat,
                                                  pvalue, avg1, avg2, change])
-    df_res.to_csv('results/changes-own_dur.csv', index=False)
+    df_res.to_csv('results/' + project_name + '-performance-diff.csv', index=False)
 
 
-def main(commits_file):
+def main():
     print('starting...')
     # commits_list = ['1bd1fd8e6065da9d07b5a3a1723b059246b14001', 'e8f24e86bb2d54493e3f0c0bd7787abb1d1d7443', '1914e7daae2cb39451046e67b993c8ab77e34397']
     # bcel:
-    commits_list = ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8912857ddb33e82d3ccc146a24e',
+    commits = {'bcel': ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8912857ddb33e82d3ccc146a24e',
                     'bbaf623d750f030d186ed026dc201995145c63ec', 'fa271c5d7ed94dd1d9ef31c52f32d1746d5636dc',
                     'dce57b377d1ad6711ff613639303683e90f7bcc8', '9174edf0d530540c9f6df76b4d786c5a6ad78a5d',
-                    '3aecd517ad0ac4c83828a5f89b6b062acb6f4f6a', 'f38847e90714fbefc33042912d1282cc4fb7d43e'
-                    ]
+                    '3aecd517ad0ac4c83828a5f89b6b062acb6f4f6a', 'f38847e90714fbefc33042912d1282cc4fb7d43e'],
+                    'csv': ['73a432514936fcee1386b37a0d60dcd913706bd1','e7142a3937825074ec68e4bacba30f9c962bd1e4','df479df17676148bf6391401a704a7d7265c45fa','399d2929ee0912bfeda8a4ef125f1b96bb7fd144','f3b8653021830d8a503c5e7a9d33cb82b16db739','f2c58503d76be1dfb8072f6a7d592f88133708e1','41b194c718d50763a79951029787cca70a5804a5','1447159b926076c9222a96b3abbe17571953a74f','4f0daa3bb2a5fa28286f1973deb9d13996cc73cc','bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f'],
+                    'text': ['cb85bed468e99d34b88d0c81fe20eb3b1615660e',
+                                'b63df8d66e8306b2608c16be3661248348e78a2f',
+                                '3866d2626dc3767b003c7cfe163a388b10c80957',
+                                '7643b12421100d29fd2b78053e77bcb04a251b2e',
+                                '4736b16d0e644289f3106275ebb1315750234e40',
+                                'e1af89b53855f2f19138cbc3e8a49ca179c3d8f8',
+                                'd3d93c4e68ce5d8c25aecbfff9d17017594bf3f2',
+                                'ba44287bdd17a709523364820495760645da85b9'],
+                    'easymock': ['1a01c13b73c0c66de1efa3db4d73a839aaf20ab9',
+                                '266c64660523d728592e646fa9f3f3e2fdfdbc4a',
+                                'caf80a128f00481e8c19151257001015acc3e76e',
+                                'a6e7c7e6fc54c8ee3dce10edbe76c1821f10cd92',
+                                '0c45595df8f8a0939dbc0b0385c8afe7502b1190',
+                                '853c1e35326a54e3fc28177c5c84c07652750140',
+                                '3506ccdfa91500016e3a0908d7ccabc171aa5602',
+                                '22ade6817ad07f22f1d8f0263ff6ddc6fc9b05db',
+                                '36782213bf5e8f1e0f601cb73774ec7a5a8c58f1'],
+                    'jgit': ['73a432514936fcee1386b37a0d60dcd913706bd1',
+                            'e7142a3937825074ec68e4bacba30f9c962bd1e4',
+                            'df479df17676148bf6391401a704a7d7265c45fa',
+                            '399d2929ee0912bfeda8a4ef125f1b96bb7fd144',
+                            'f3b8653021830d8a503c5e7a9d33cb82b16db739',
+                            'f2c58503d76be1dfb8072f6a7d592f88133708e1',
+                            '41b194c718d50763a79951029787cca70a5804a5',
+                            '1447159b926076c9222a96b3abbe17571953a74f',
+                            '4f0daa3bb2a5fa28286f1973deb9d13996cc73cc',
+                            'bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f',
+                            '29159f1171c4930128ab0557836e856ce8cba6c8'],
+                    'openfire': ['c0f2614b1bcfbdcad337128978aa9ae82e66fc50',
+                                'd7dfd04eca85ca8933a408c7bc99eb6ed8fb8599',
+                                'e020f58943742b0be541bafd30808d587867712b',
+                                'f5aece5bbdd81bbab824e3995cbdfd96920766f2',
+                                '5b6b732fda44fbc3c38a7036b1ed7522d9f8b129',
+                                '348185c8385cf8923455a71dd614d7ee09ee7bf0',
+                                '1bcb80f9f23d70fbd7ee8a833abe02b2305f848e',
+                                'cb90fc79edb71b888d3ee25f2f59da3be2e72174',
+                                'c4c568e13715a3cdb980e340352ec4fb30c61fae',
+                                '2bc37e6f1d48c84228efe2ccd360148cc9be46f0',
+                                '9b35e20028cdb52e29e4ac815a8419ffb35ca2d3',
+                                'b61bce39e3a0ce786e4464706ea2e9b4c5be7a77',
+                                '18a7bb6262b4237f9c80071d24234f5d9b2e08fc',
+                                '13e73ed3d7fc00646c642d02b66b50a86cd1c42b',
+                                '18257f671cef3c8340be950a4d5c50ef3b31d9f6',
+                                '92a9f2e9e2c78aabdf446af0c680c7c0991f807a',
+                                '41041642078a1e498c4f8b6e6a5b226409b5dbcd']
+                    }
 
     # with open(args.commits) as f:
     #     commits_list = f.read().splitlines()
@@ -154,9 +202,10 @@ def main(commits_file):
     # file = '../data/resources.csv'
     # file = 'C:\\Users\\paulo\\ufpr\\datasets\\software-metrics\\resources\\resources-csv-1.csv'
 
-    # bcel
-    file = 'C:\\Users\\paulo\\ufpr\\datasets\\bcel\\own_dur_trace-all.csv'
-    student_ttest_by_method(file, commits_list)
+    for project_name in projects:
+        file = 'C:\\Users\\paulo\\ufpr\\datasets\\' + project_name + '\\own_dur_trace-all.csv'
+        commits_list = commits[project_name]
+        student_ttest_by_method(project_name, file, commits_list)
 
 
 if __name__ == "__main__":
@@ -164,4 +213,4 @@ if __name__ == "__main__":
     ap.add_argument('--commits', required=False,
                     help='csv with a list of commits (newest to oldest) to compare commitA and commitB')
     args = ap.parse_args()
-    main(args.commits)
+    main()
