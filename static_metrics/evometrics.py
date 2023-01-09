@@ -40,7 +40,7 @@ if __name__ == "__main__":
     csbsArray = {}
     acdfArray = {}
 
-    csvPath = args.absolute_path + "results/" + args.project_name + "-results-processMetrics.csv"
+    csvPath = "results/" + args.project_name + "-results-processMetrics.csv"
     f = open(csvPath, "w")
     writer = csv.writer(f)
 

@@ -1,5 +1,6 @@
 import glob
 import os
+import sys
 from asyncore import write
 from functools import reduce
 from importlib.resources import path
@@ -37,9 +38,9 @@ def parse_ck_results(file_path, project_name):
         df_all = pd.read_csv('../results/ck/ck_all.csv')  # , dtype={"user_id": int, "username": "string"})
 
     except:
-        pass
+        print('Error reading ck_all.csv file: ' + str(sys.exc_info()))
     for file in csv_files:
-        # print(file)
+        print(file)
         hash = file.split('/')[-1][:-4]
         hash = hash.replace(project_name + '_', '')
         hash = hash.replace('_class', '')
@@ -62,7 +63,7 @@ def parse_understand_results(file_path, project_name):
     csv_files = glob.glob(file_path + '*.{}'.format('csv'))
     df_all = pd.DataFrame()
     try:
-        df_all = pd.read_csv('../results/understand/und_all.csv', index_col=False)
+        df_all = pd.read_csv('../results/und/und_all.csv', index_col=False)
     except:
         pass
     for file in csv_files:
@@ -71,7 +72,7 @@ def parse_understand_results(file_path, project_name):
         df['commit_hash'] = hash
         df['project_name'] = project_name
         df_all = df_all.append(df)
-    df_all.to_csv('results/understand/und_all.csv')
+    df_all.to_csv('results/und/und_all.csv', index=False)
 
 
 def merge_csv_files(file_path, tool):
@@ -406,17 +407,19 @@ def join_all_metrics():
 
 if __name__ == "__main__":
     # projects = ['commons-bcel', 'commons-csv', 'easymock', 'gson', 'Openfire', 'commons-text', 'commons-io', 'pdfbox', 'dubbo']
-    # result_df = pd.DataFrame()
-    # for project_name in projects:
-    # # ck
-    # # file, class, commit_hash, project_name
-    # path = 'results/ck/' + project_name + '/'
-    # parse_ck_results(path, project_name)
+    projects = ['jgit']
+    result_df = pd.DataFrame()
+    for project_name in projects:
+        print(project_name)
+        # # ck
+        # # file, class, commit_hash, project_name
+        # path = 'results/ck/' + project_name + '/'
+        # parse_ck_results(path, project_name)
 
-    # # understand
-    # # Kind, Name, File
-    # path = 'results/understand/' + project_name + '/'
-    # parse_understand_results(path, project_name)
+        # understand
+        # Kind, Name, File
+        path = 'results/und/' + project_name + '/'
+        parse_understand_results(path, project_name)
 
     # # refactoring miner
     # path = 'results/refactoring/' + project_name + '-results-refactoring-metrics.csv'
@@ -444,7 +447,7 @@ if __name__ == "__main__":
     #     result_df = merge_csv_files(path, tool)
     #     result_df.to_csv(path + tool + '_all.csv', index=False)
 
-    join_all_metrics()
+    # join_all_metrics()
     # join_static_features()
 ################################################# ROGERIO
 # print(result_df.head())
