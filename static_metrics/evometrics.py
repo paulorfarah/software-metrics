@@ -40,7 +40,7 @@ if __name__ == "__main__":
     csbsArray = {}
     acdfArray = {}
 
-    csvPath = args.absolute_path + "results/" + args.project_name + "-results-processMetrics.csv"
+    csvPath = "results/" + args.project_name + "-results-processMetrics.csv"
     f = open(csvPath, "w")
     writer = csv.writer(f)
 
@@ -308,6 +308,24 @@ if __name__ == "__main__":
     #             ver_previous = ver_current
     #             release += 1
     else:
-        print('ERROR: invalid mode!')
+        print(args.commits)
+        i = 0
+        cur_com = ''
+        prev_com = ''
+        for line in reversed(list(open(args.commits))):
+            # print(line)
+            if i == 0:
+                cur_com = line
+            else:
+                prev_com = cur_com
+                cur_com = line
+                print(prev_com)
+                print(cur_com)
+
+                pathA.checkout(prev_com)
+                pathB.checkout(cur_com)
+                runJar(pathA, pathB, prev_com, cur_com)
+                print('---')
+            i += 1
     f.close()
 print('evometrics ended.')
