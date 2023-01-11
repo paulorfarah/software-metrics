@@ -22,4 +22,4 @@ DIR_B="${DIR_B}${PROJECT_NAME}"
 git clone "$REPO" "$DIR_A"
 git clone "$REPO" "$DIR_B"
 #echo "Script executed from: ${PWD}"
-nohup python3 changeDistiller.py --pathA "${DIR_A}" --pathB "${DIR_B}" --commits commits.txt --projectName "${PROJECT_NAME}" --absolutePath "${PWD}/" --mode "tag" &
+python3 changeDistiller.py --pathA "${DIR_A}" --pathB "${DIR_B}" --commits jgit.txt --projectName "${PROJECT_NAME}" --absolutePath "${PWD}/" --mode "csv" 

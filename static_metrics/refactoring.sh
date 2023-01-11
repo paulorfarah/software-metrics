@@ -23,5 +23,5 @@ git clone "$REPO" "$DIR_A"
 git clone "$REPO" "$DIR_B"
 #echo "Script executed from: ${PWD}"
 rm -Rf nohup.out
-nohup python3 refactoring.py --git_repo_folder_A "${DIR_A}" --git_repo_folder_B "${DIR_B}" --project_name "${PROJECT_NAME}" --mode "tag" &
+nohup python3 refactoring.py --git_repo_folder_A "${DIR_A}" --git_repo_folder_B "${DIR_B}" --project_name "${PROJECT_NAME}" --commits "jgit.txt" --mode "csv" &
 #echo "nohup python3 evometrics.py --pathA ${DIR_A} --pathB ${DIR_B} --commits ${PROJECT_NAME}.txt --project_name ${PROJECT_NAME} --absolute_path ${PWD}/ --mode \"csv\" &"
