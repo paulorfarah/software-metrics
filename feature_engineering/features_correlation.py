@@ -34,7 +34,7 @@ def join_all_dataset(project_name):
                   'hasJavaDoc', 'commit_hash', 'project_name']
     df_ck = pd.read_csv('../static_metrics/results/ck/ck_all.csv', usecols=ck_metrics, sep=',',
                         index_col=False)
-    df_ck = df_ck.loc[df['project_name'] == project_name]
+    df_ck = df_ck[df_ck['project_name'] == project_name]
     path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
     try:
@@ -307,4 +307,4 @@ if __name__ == "__main__":
     # for project_name in projects:
     #     join_jgit_dataset(project_name, commits[project_name])
 
-    join_all_dataset('bcel')
+    join_all_dataset('commons-bcel')
