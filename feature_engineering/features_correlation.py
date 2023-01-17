@@ -36,23 +36,24 @@ def ck_ownduration_correlation(project_name):
     df_ck = pd.read_csv('../static_metrics/results/ck/ck_all.csv', usecols=ck_metrics, sep=',',
                         index_col=False)
     df_ck = df_ck[df_ck['project_name'] == project_name]
-    path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
-    #df_ck = df_ck.loc[df_ck['project_name'] == project_name]
-    #path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
-
+    #path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
+    path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
+    print(path1)
 
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
-    try:
-        spl_word = "commons-"
-        file_str = df_ck[df_ck['file'].str.contains(spl_word)].iloc[0]
-        res = file_str['file'].split(spl_word, 1)
-        splitString = res[0]
-        df_ck['file'] = df_ck.file.str.replace(splitString, '')
-    except:
-        pass
+    #try:
+    #    spl_word = "commons-"
+    #    file_str = df_ck[df_ck['file'].str.contains(spl_word)].iloc[0]
+    #    res = file_str['file'].split(spl_word, 1)
+    #    splitString = res[0]
+    #    df_ck['file'] = df_ck.file.str.replace(splitString, '')
+    #except:
+    #    pass
+    print(df_ck.head())
     df = pd.merge(left=df, right=df_ck, left_on=['project_name', 'commit_hash', 'class_name'],
                   right_on=['project_name', 'commit_hash', 'file'], how='left')
 
+    print(df.head())
     #plot correlations
     metrics = ['own_duration'] + ck_metrics[4:52] + ck_metrics[55:83]
 
@@ -111,11 +112,11 @@ def und_ownduration_correlation(project_name):
     df_und = df_und[df_und.columns[8:]]
     df_und['class'] = df_und['Name']
 
-    df = pd.merge(left=df, right=df_und, left_on=['project_name', 'commit_hash', 'file'],
+    df = pd.merge(left=df, right=df_und, left_on=['project_name', 'commit_hash', 'class_name'],
                   right_on=['project_name', 'commit_hash', 'File'], how='left')
 
     #plot correlations
-    metrics = ['own_duration'] + und_metrics[2:55]
+    metrics = ['own_duration'] + und_metrics[10:64]
 
     q25, q75 = percentile(df['own_duration'], 25), percentile(df['own_duration'], 75)
     iqr = q75 - q25
@@ -129,7 +130,12 @@ def und_ownduration_correlation(project_name):
 
     # df.loc[(df['Discount'] >= 1000) & (df['Discount'] <= 2000)]
     df_outliers = df.loc[(df['own_duration'] >= lower) & (df['own_duration'] <= upper)]
+    print(df_outliers.dtypes)
     for m in metrics:
+        print(m)
+        print(df_outliers[m])
+        df_outliers[m] = df_outliers[m].fillna(0)
+        df_outliers[m] = pd.to_numeric(df_outliers[m])
         sns.lmplot(x="own_duration", y=m, data=df_outliers)
         plt.savefig('results/correlation/und/' + project_name + '/' + project_name + '_' + m + '-outliers.pdf')
     # plt.show()
@@ -556,9 +562,10 @@ if __name__ == "__main__":
     # print(jgit_all['project_name'].unique())
 
     #join_all_dataset('commons-bcel')
-    systems = ['commons-text', 'easymock', 'openfire']
+    systems = ['commons-bcel', 'commons-text', 'easymock', 'openfire']
+#    systems = ['commons-bcel']
     for system in systems:
-        ck_ownduration_correlation(system)
-        # und_ownduration_correlation(system)
-        evo_ownduration_correlation(system)
-        cd_ownduration_correlation(system)
+        #ck_ownduration_correlation(system)
+        und_ownduration_correlation(system)
+        #evo_ownduration_correlation(system)
+        #cd_ownduration_correlation(system)
