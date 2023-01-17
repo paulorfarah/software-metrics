@@ -17,28 +17,46 @@ def ck_ownduration_correlation(project_name):
     df = df.merge(df_pd[['project_name', 'prevcommit', 'class_name', 'avg2']].rename(
         columns={'prevcommit': 'commit_hash', 'avg2': 'own_duration'}), how='outer')
 
-    ck_metrics = ['index', 'file', 'class', 'type', 'cbo_x', 'cboModified_x', 'fanin_x', 'fanout_x', 'wmc_x', 'dit',
-                  'noc', 'rfc_x', 'lcom', 'lcom*', 'tcc', 'lcc', 'totalMethodsQty', 'staticMethodsQty',
-                  'publicMethodsQty', 'privateMethodsQty', 'protectedMethodsQty', 'defaultMethodsQty',
-                  'visibleMethodsQty', 'abstractMethodsQty', 'finalMethodsQty', 'synchronizedMethodsQty',
-                  'totalFieldsQty', 'staticFieldsQty', 'publicFieldsQty', 'privateFieldsQty', 'protectedFieldsQty',
-                  'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty', 'nosi', 'loc_x', 'returnQty',
-                  'loopQty_x', 'comparisonsQty_x', 'tryCatchQty_x', 'parenthesizedExpsQty_x', 'stringLiteralsQty_x',
-                  'numbersQty_x', 'assignmentsQty_x', 'mathOperationsQty_x', 'variablesQty_x', 'maxNestedBlocksQty_x',
-                  'anonymousClassesQty_x', 'innerClassesQty_x', 'lambdasQty_x', 'uniqueWordsQty_x', 'modifiers_x',
-                  'logStatementsQty_x', 'method', 'constructor', 'line', 'cbo_y', 'cboModified_y', 'fanin_y',
-                  'fanout_y', 'wmc_y', 'rfc_y', 'loc_y', 'returnsQty', 'variablesQty_y', 'parametersQty',
-                  'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'loopQty_y',
-                  'comparisonsQty_y', 'tryCatchQty_y', 'parenthesizedExpsQty_y', 'stringLiteralsQty_y', 'numbersQty_y',
-                  'assignmentsQty_y', 'mathOperationsQty_y', 'maxNestedBlocksQty_y', 'anonymousClassesQty_y',
-                  'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
-                  'hasJavaDoc', 'commit_hash', 'project_name']
-    df_ck = pd.read_csv('../static_metrics/results/ck/ck_all.csv', usecols=ck_metrics, sep=',',
+    # ck_metrics_class_and_methods = ['index', 'file', 'class', 'type', 'cbo_x', 'cboModified_x', 'fanin_x', 'fanout_x', 'wmc_x', 'dit',
+    #               'noc', 'rfc_x', 'lcom', 'lcom*', 'tcc', 'lcc', 'totalMethodsQty', 'staticMethodsQty',
+    #               'publicMethodsQty', 'privateMethodsQty', 'protectedMethodsQty', 'defaultMethodsQty',
+    #               'visibleMethodsQty', 'abstractMethodsQty', 'finalMethodsQty', 'synchronizedMethodsQty',
+    #               'totalFieldsQty', 'staticFieldsQty', 'publicFieldsQty', 'privateFieldsQty', 'protectedFieldsQty',
+    #               'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty', 'nosi', 'loc_x', 'returnQty',
+    #               'loopQty_x', 'comparisonsQty_x', 'tryCatchQty_x', 'parenthesizedExpsQty_x', 'stringLiteralsQty_x',
+    #               'numbersQty_x', 'assignmentsQty_x', 'mathOperationsQty_x', 'variablesQty_x', 'maxNestedBlocksQty_x',
+    #               'anonymousClassesQty_x', 'innerClassesQty_x', 'lambdasQty_x', 'uniqueWordsQty_x', 'modifiers_x',
+    #               'logStatementsQty_x', 'method', 'constructor', 'line', 'cbo_y', 'cboModified_y', 'fanin_y',
+    #               'fanout_y', 'wmc_y', 'rfc_y', 'loc_y', 'returnsQty', 'variablesQty_y', 'parametersQty',
+    #               'methodsInvokedQty', 'methodsInvokedLocalQty', 'methodsInvokedIndirectLocalQty', 'loopQty_y',
+    #               'comparisonsQty_y', 'tryCatchQty_y', 'parenthesizedExpsQty_y', 'stringLiteralsQty_y', 'numbersQty_y',
+    #               'assignmentsQty_y', 'mathOperationsQty_y', 'maxNestedBlocksQty_y', 'anonymousClassesQty_y',
+    #               'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
+    #               'hasJavaDoc', 'commit_hash', 'project_name']
+    ck_metrics_class = ['file', 'class', 'type', 'cbo', 'cboModified', 'fanin', 'fanout', 'wmc', 'dit', 'noc', 'rfc',
+                        'lcom', 'lcom*', 'tcc', 'lcc', 'totalMethodsQty', 'staticMethodsQty', 'publicMethodsQty',
+                        'privateMethodsQty', 'protectedMethodsQty', 'defaultMethodsQty', 'visibleMethodsQty',
+                        'abstractMethodsQty', 'finalMethodsQty', 'synchronizedMethodsQty', 'totalFieldsQty',
+                        'staticFieldsQty', 'publicFieldsQty', 'privateFieldsQty', 'protectedFieldsQty',
+                        'defaultFieldsQty', 'finalFieldsQty', 'synchronizedFieldsQty', 'nosi', 'loc', 'returnQty',
+                        'loopQty', 'comparisonsQty', 'tryCatchQty', 'parenthesizedExpsQty', 'stringLiteralsQty',
+                        'numbersQty', 'assignmentsQty', 'mathOperationsQty', 'variablesQty', 'maxNestedBlocksQty',
+                        'anonymousClassesQty', 'innerClassesQty', 'lambdasQty', 'uniqueWordsQty', 'modifiers',
+                        'logStatementsQty', 'commit_hash', 'project_name']
+
+    df_ck = pd.read_csv('../static_metrics/results/ck/ck_all2.csv', usecols=ck_metrics_class, sep=',',
                         index_col=False)
     df_ck = df_ck[df_ck['project_name'] == project_name]
+<<<<<<< HEAD
     #path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
     path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
     print(path1)
+=======
+    path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
+    # df_ck = df_ck.loc[df_ck['project_name'] == project_name]
+    # path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
+
+>>>>>>> 8cbe47fec8313e203c4a14b9b8d25c5c44f1cf9b
 
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
     #try:
@@ -55,7 +73,8 @@ def ck_ownduration_correlation(project_name):
 
     print(df.head())
     #plot correlations
-    metrics = ['own_duration'] + ck_metrics[4:52] + ck_metrics[55:83]
+    # metrics = ['own_duration'] + ck_metrics_class[4:52] + ck_metrics_class[55:83]
+    metrics = ['own_duration'] + ck_metrics_class[4:51]
 
 
     q25, q75 = percentile(df['own_duration'], 25), percentile(df['own_duration'], 75)
@@ -71,12 +90,13 @@ def ck_ownduration_correlation(project_name):
     # df.loc[(df['Discount'] >= 1000) & (df['Discount'] <= 2000)]
     df_outliers = df.loc[(df['own_duration'] >= lower) & (df['own_duration'] <= upper)]
     for m in metrics:
-        sns.lmplot(x="own_duration", y=m, data=df_outliers)
-        plt.savefig('results/correlation/ck/' + project_name + '/' + project_name + '_' + m + '2.pdf')
+        if m != 'own_duration':
+            sns.lmplot(x="own_duration", y=m, data=df_outliers)
+            plt.savefig('results/correlation/ck/' + project_name + '/' + project_name + '_' + m.replace('*', '_') + '.pdf')
     # plt.show()
 
-    df[metrics].corr().to_csv('results/correlation/' + project_name + 'ck_correlation.csv', index=False)
-    df_outliers[metrics].corr().to_csv('results/correlation/' + project_name + 'ck_correlation_outliers.csv', index=False)
+    df[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation.csv', index=False)
+    df_outliers[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_outliers.csv', index=False)
 
 
 def und_ownduration_correlation(project_name):
@@ -332,7 +352,7 @@ def join_jgit_dataset(project_name, commits_list):
                   'assignmentsQty_y', 'mathOperationsQty_y', 'maxNestedBlocksQty_y', 'anonymousClassesQty_y',
                   'innerClassesQty_y', 'lambdasQty_y', 'uniqueWordsQty_y', 'modifiers_y', 'logStatementsQty_y',
                   'hasJavaDoc', 'commit_hash', 'project_name']
-    df_ck = pd.read_csv('../static_metrics/results/ck/' + project_name + '-ck_all.csv', usecols=ck_metrics, sep=',', index_col=False)
+    df_ck = pd.read_csv('../static_metrics/results/ck/' + project_name + '-ck_all2.csv', usecols=ck_metrics, sep=',', index_col=False)
     path1 = '/mnt/sda4/software-metrics/static_metrics/jgit/'
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
     try:
@@ -561,11 +581,10 @@ if __name__ == "__main__":
     #     jgit_all.append(join_jgit_dataset(project_name, commits[project_name]))
     # print(jgit_all['project_name'].unique())
 
-    #join_all_dataset('commons-bcel')
-    systems = ['commons-bcel', 'commons-text', 'easymock', 'openfire']
-#    systems = ['commons-bcel']
-    for system in systems:
-        #ck_ownduration_correlation(system)
-        und_ownduration_correlation(system)
-        #evo_ownduration_correlation(system)
-        #cd_ownduration_correlation(system)
+    # projects = ['commons-bcel', 'commons-text', 'easymock', 'openfire']
+    projects = ['jgit']
+    for system in projects:
+        ck_ownduration_correlation(system)
+        # und_ownduration_correlation(system)
+        # evo_ownduration_correlation(system)
+        # cd_ownduration_correlation(system)
