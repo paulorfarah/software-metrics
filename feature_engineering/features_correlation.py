@@ -46,9 +46,11 @@ def ck_ownduration_correlation(project_name):
 
     df_ck = pd.read_csv('../static_metrics/results/ck/ck_all2.csv', usecols=ck_metrics_class, sep=',',
                         index_col=False)
-    df_ck = df_ck.loc[df_ck['project_name'] == project_name]
+    df_ck = df_ck[df_ck['project_name'] == project_name]
+    path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
+    # df_ck = df_ck.loc[df_ck['project_name'] == project_name]
     # path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
-    path1 = '/mnt/sda4/software-metrics/static_metrics/jgit/'
+
 
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
     try:
