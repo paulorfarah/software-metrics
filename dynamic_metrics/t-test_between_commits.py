@@ -44,7 +44,7 @@ def read_csv(file):
     return df
 
 
-def student_ttest_by_method(project_name, file, versions):
+def student_ttest_by_class(project_name, file, versions):
     # https://analyticsindiamag.com/a-beginners-guide-to-students-t-test-in-python-from-scratch%EF%BF%BC/
     # https://stackoverflow.com/questions/13404468/t-test-in-pandas
 
@@ -137,6 +137,76 @@ def student_ttest_by_method(project_name, file, versions):
     df_res.to_csv('results/' + project_name + '-performance-diff.csv', index=False)
 
 
+def student_ttest_by_method(project_name, file, versions):
+    df = read_csv(file)
+    df_res = pd.DataFrame(pd.np.empty((0, 9)))
+    df_res.columns = ['commit', 'prevcommit', 'class_name', 'method_name', 'metric', 'stat', 'pvalue', 'avg1', 'avg2',
+                      'change']
+    # df_res.columns = ['committer_date', 'commit_hash', 'class_name', 'own_duration_avg']
+
+    for v2 in range(1, len(versions)):
+        v1 = v2 - 1
+        df1 = df.query("commit_hash == '" + versions[v1] + "'")
+        # df1 = df.groupby('a')['b'].apply(list).reset_index(name='new')
+        grouped1 = df1.groupby(['commit_hash', 'class_name', 'method_name'])['own_duration_avg'].apply(list).reset_index(name='new')
+
+        # for metric in val_cols[2:]:
+        metric = 'own_duration_avg'
+        print("---------------- " + metric + " -------------------------")
+        # rows = grouped1[metric]
+
+        for name, value in grouped1.iterrows():
+            # print(len(values1))
+            # for i in values1:
+            #     print(i, type(i))
+            commit = value[0]
+            class_name = value[1]
+            method_name = value[2]
+            vals1 = value[3]
+
+            vals2 = df.loc[(df['commit_hash'] == versions[v2]) &
+                           (df['class_name'] == class_name)   &
+                           (df['method_name'] == name[2])][metric].to_list()
+            try:
+                if isinstance(vals1, collections.abc.Sequence) and isinstance(vals2, collections.abc.Sequence):
+                    stat, pvalue = ttest_ind(vals1, vals2)
+                    # print(commit + ' ' + class_name + ' ' + str(pvalue))
+                else:
+                    stat = -1
+                    pvalue = -1
+            except ZeroDivisionError:
+                print('ZeroDivisionError1: ', vals1, vals2)
+                stat = 0
+                pvalue = 100
+            if pvalue <= 0.05:
+                try:
+                    avg1 = sum(vals1) / len(vals1)
+                except ZeroDivisionError:
+                    print('ZeroDivisionError2: ', vals1)
+                    avg1 = 0
+                except:
+                    print('error1: ', sys.exc_info())
+                    print('vals1: ', len(vals1))
+                try:
+                    avg2 = sum(vals2) / len(vals2)
+                except ZeroDivisionError:
+                    print('ZeroDivisionError3: ', vals2)
+                    avg2 = 0
+                except:
+                    print('error2: ', sys.exc_info())
+                    print('vals2: ', vals2)
+
+                try:
+                    change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
+                except ZeroDivisionError:
+                    print('ZeroDivisionError4: ', avg1)
+                    change = 100
+                df_res.loc[len(df_res.index)] = [versions[v1], versions[v2], class_name, method_name, metric, stat,
+                                                 pvalue, avg1, avg2, change]
+                print([versions[v1], versions[v2], class_name, method_name, metric, stat,
+                                                 pvalue, avg1, avg2, change])
+    df_res.to_csv('results/method_' + project_name + '-performance-diff.csv', index=False)
+
 def main():
     print('starting...')
     # commits_list = ['1bd1fd8e6065da9d07b5a3a1723b059246b14001', 'e8f24e86bb2d54493e3f0c0bd7787abb1d1d7443', '1914e7daae2cb39451046e67b993c8ab77e34397']
@@ -209,6 +279,7 @@ def main():
     for project_name in projects:
         file = 'C:\\Users\\paulo\\ufpr\\datasets\\' + project_name + '\\own_dur_trace-all.csv'
         commits_list = commits[project_name]
+        # student_ttest_by_method(project_name, file, commits_list)
         student_ttest_by_method(project_name, file, commits_list)
 
 
