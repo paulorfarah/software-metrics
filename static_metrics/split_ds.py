@@ -6,7 +6,7 @@ projects = ['commons-bcel', 'commons-text', 'commons-csv', 'easymock', 'jgit', '
 #projects = ['Openfire']
 for prj in projects:
     dft = df.loc[df['project_name'] == prj]
-    dft.to_csv('results/und/' + prj + 'ck_2.csv', index=False)
+    dft.to_csv('results/und/' + prj + '-und_2.csv', index=False)
     print(prj + ': ' + str(dft.shape))
 
 # ck:
