@@ -8,23 +8,26 @@ from numpy import percentile
 pd.set_option('display.max_columns', None)
 
 
-def ck_ownduration_correlation(project_name, file, type):
+def ck_ownduration_correlation(project_name, file, type, ck_file):
     print(project_name + ' ck')
-    if type == 'diff':
-        df_pd = pd.read_csv(file, sep=',')  # ok
-        df_pd['project_name'] = project_name
+
+    # read trace own duration metric
+    df_pd = pd.read_csv(file, sep=',')
+    df_pd['project_name'] = project_name
+    if type == 'diff' or type == 'avg':
         df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
                                    class_name=df_pd['class_name'], own_duration=df_pd['avg1'])
         df = df.merge(df_pd[['project_name', 'prevcommit', 'class_name', 'avg2']].rename(
             columns={'prevcommit': 'commit_hash', 'avg2': 'own_duration'}), how='outer')
-    elif type == 'avg':
-        df_pd = pd.read_csv(file, sep=',')
-        df_pd['project_name'] = project_name
+    elif type == 'median':
         df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['median'])
-        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'median']].rename(
-            columns={'median': 'own_duration'}), how='outer')
-        print(df_pd.head())
+                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'median_val']].rename(
+            columns={'median_val': 'own_duration'}), how='outer')
+        df = df.loc[df['perf_changed'] == 1]
+
+
+    #read static ck metrics
 
     ck_metrics_class_and_methods = ['index', 'file', 'class', 'type', 'cbo_x', 'cboModified_x', 'fanin_x', 'fanout_x', 'wmc_x', 'dit',
                   'noc', 'rfc_x', 'lcom', 'lcom*', 'tcc', 'lcc', 'totalMethodsQty', 'staticMethodsQty',
@@ -53,17 +56,15 @@ def ck_ownduration_correlation(project_name, file, type):
     #                     'anonymousClassesQty', 'innerClassesQty', 'lambdasQty', 'uniqueWordsQty', 'modifiers',
     #                     'logStatementsQty', 'commit_hash', 'project_name']
 
-    df_ck = pd.read_csv('../static_metrics/results/ck/ck_all.csv', usecols=ck_metrics_class_and_methods, sep=',',
+
+    df_ck = pd.read_csv(ck_file, usecols=ck_metrics_class_and_methods, sep=',',
                         index_col=False)
+
     df_ck = df_ck[df_ck['project_name'] == project_name]
-    # path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
-    path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
-
-
-    # df_ck = df_ck.loc[df_ck['project_name'] == project_name]
-    # path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
-
-
+    if project_name == 'jgit':
+        path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
+    else:
+        path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
     df_ck['file'] = df_ck['file'].str.replace(path1, '')
     #try:
     #    spl_word = "commons-"
@@ -73,15 +74,13 @@ def ck_ownduration_correlation(project_name, file, type):
     #    df_ck['file'] = df_ck.file.str.replace(splitString, '')
     #except:
     #    pass
-    print(df_ck.head())
+
     df = pd.merge(left=df, right=df_ck, left_on=['project_name', 'commit_hash', 'class_name'],
                   right_on=['project_name', 'commit_hash', 'file'], how='left')
 
-    print(df.head())
     #plot correlations
     metrics = ['own_duration'] + ck_metrics_class_and_methods[4:52] + ck_metrics_class_and_methods[55:83]
     # metrics = ['own_duration'] + ck_metrics_class[4:51]
-
 
     q25, q75 = percentile(df['own_duration'], 25), percentile(df['own_duration'], 75)
     iqr = q75 - q25
@@ -98,21 +97,35 @@ def ck_ownduration_correlation(project_name, file, type):
     for m in metrics:
         if m != 'own_duration':
             sns.lmplot(x="own_duration", y=m, data=df_outliers)
-            plt.savefig('results/correlation/ck/' + project_name + '/' + project_name + '_' + m.replace('*', '_') + '.pdf')
+            plt.savefig('results/correlation/ck/' + project_name + '/' + project_name + '_' + m.replace('*', '_') + '_' + trace_type + '.pdf')
     # plt.show()
 
-    df[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation.csv', index=False)
-    df_outliers[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_outliers.csv', index=False)
+    df[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation' + trace_type + '.csv', index=False)
+    df_outliers[metrics].corr().to_csv('results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_outliers' + trace_type + '.csv', index=False)
 
 
-def und_ownduration_correlation(project_name):
+def und_ownduration_correlation(project_name, file):
     print(project_name + ' und')
-    df_pd = pd.read_csv('../dynamic_metrics/results/' + project_name + '-performance-diff.csv', sep=',')  # ok
+    # df_pd = pd.read_csv('../dynamic_metrics/results/' + project_name + '-performance-diff.csv', sep=',')
+    df_pd = pd.read_csv(file, sep=',')
     df_pd['project_name'] = project_name
-    df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
-                               class_name=df_pd['class_name'], own_duration=df_pd['avg1'])
-    df = df.merge(df_pd[['project_name', 'prevcommit', 'class_name', 'avg2']].rename(
-        columns={'prevcommit': 'commit_hash', 'avg2': 'own_duration'}), how='outer')
+
+    if type == 'diff' or type == 'avg':
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['avg1'])
+        df = df.merge(df_pd[['project_name', 'prevcommit', 'class_name', 'avg2']].rename(
+            columns={'prevcommit': 'commit_hash', 'avg2': 'own_duration'}), how='outer')
+    elif type == 'median':
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'median_val']].rename(
+            columns={'median_val': 'own_duration'}), how='outer')
+        df = df.loc[df['perf_changed'] == 1]
+
+    # df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+    #                            class_name=df_pd['class_name'], own_duration=df_pd['avg1'])
+    # df = df.merge(df_pd[['project_name', 'prevcommit', 'class_name', 'avg2']].rename(
+    #     columns={'prevcommit': 'commit_hash', 'avg2': 'own_duration'}), how='outer')
 
     # understand
     und_metrics = ["index1", "index2", "index3", "index4", "index5", "index6", "index7", "Kind", "Name", "File",
@@ -135,6 +148,13 @@ def und_ownduration_correlation(project_name):
                          engine='python', names=und_metrics)
 
     df_und = df_und.loc[df_und['project_name'] == project_name]
+
+    # if project_name == 'jgit':
+    #     path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
+    # else:
+    #     path1 = '/groups/ilabt-imec-be/software-performance/ck/' + project_name + '/'
+
+
     df_und = df_und[df_und.columns[8:]]
     df_und['class'] = df_und['Name']
 
@@ -148,26 +168,27 @@ def und_ownduration_correlation(project_name):
     iqr = q75 - q25
     cut_off = iqr * 1.5
     lower, upper = q25 - cut_off, q75 + cut_off
+
     # identify outliers
-    outliers = [x for x in df['own_duration'] if x < lower or x > upper]
-    print('outliers:')
-    for o in outliers:
-        print(o)
+    # outliers = [x for x in df['own_duration'] if x < lower or x > upper]
+    # print('outliers:')
+    # for o in outliers:
+    #     print(o)
 
     # df.loc[(df['Discount'] >= 1000) & (df['Discount'] <= 2000)]
     df_outliers = df.loc[(df['own_duration'] >= lower) & (df['own_duration'] <= upper)]
-    print(df_outliers.dtypes)
+    # print(df_outliers.dtypes)
     for m in metrics:
-        print(m)
-        print(df_outliers[m])
+        # print(m)
+        # print(df_outliers[m])
         df_outliers[m] = df_outliers[m].fillna(0)
         df_outliers[m] = pd.to_numeric(df_outliers[m])
         sns.lmplot(x="own_duration", y=m, data=df_outliers)
         plt.savefig('results/correlation/und/' + project_name + '/' + project_name + '_' + m + '-outliers.pdf')
     # plt.show()
 
-    df[metrics].corr().to_csv('results/correlation/' + project_name + 'und_correlation.csv', index=False)
-    df_outliers[metrics].corr().to_csv('results/correlation/' + project_name + 'und_correlation_outliers.csv', index=False)
+    df[metrics].corr().to_csv('results/correlation/' + project_name + '/' + project_name + '-und_correlation-' + trace_type + '.csv', index=False)
+    df_outliers[metrics].corr().to_csv('results/correlation/' + project_name + '/' + project_name + '-und_correlation_outliers-' + trace_type + '.csv', index=False)
 
 
 # def evo_ownduration_correlation(project_name):
@@ -565,37 +586,42 @@ def join_jgit_dataset(project_name, commits_list):
 
 if __name__ == "__main__":
 
-    projects = ['jgit']
-
     #commits are listed from the newest to oldest in chronological order
-    commits = {'bcel': ['73a432514936fcee1386b37a0d60dcd913706bd1', 'e7142a3937825074ec68e4bacba30f9c962bd1e4',
-                        'df479df17676148bf6391401a704a7d7265c45fa', '399d2929ee0912bfeda8a4ef125f1b96bb7fd144',
-                        'f3b8653021830d8a503c5e7a9d33cb82b16db739', 'f2c58503d76be1dfb8072f6a7d592f88133708e1',
-                        '41b194c718d50763a79951029787cca70a5804a5', '1447159b926076c9222a96b3abbe17571953a74f',
-                        '4f0daa3bb2a5fa28286f1973deb9d13996cc73cc', 'bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f',
-                        '29159f1171c4930128ab0557836e856ce8cba6c8'],
-            'jgit': ['73a432514936fcee1386b37a0d60dcd913706bd1', 'e7142a3937825074ec68e4bacba30f9c962bd1e4',
-                        'df479df17676148bf6391401a704a7d7265c45fa', '399d2929ee0912bfeda8a4ef125f1b96bb7fd144',
-                        'f3b8653021830d8a503c5e7a9d33cb82b16db739', 'f2c58503d76be1dfb8072f6a7d592f88133708e1',
-                        '41b194c718d50763a79951029787cca70a5804a5', '1447159b926076c9222a96b3abbe17571953a74f',
-                        '4f0daa3bb2a5fa28286f1973deb9d13996cc73cc', 'bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f',
-                        '29159f1171c4930128ab0557836e856ce8cba6c8'],
-               }
+    # commits = {'bcel': ['73a432514936fcee1386b37a0d60dcd913706bd1', 'e7142a3937825074ec68e4bacba30f9c962bd1e4',
+    #                     'df479df17676148bf6391401a704a7d7265c45fa', '399d2929ee0912bfeda8a4ef125f1b96bb7fd144',
+    #                     'f3b8653021830d8a503c5e7a9d33cb82b16db739', 'f2c58503d76be1dfb8072f6a7d592f88133708e1',
+    #                     '41b194c718d50763a79951029787cca70a5804a5', '1447159b926076c9222a96b3abbe17571953a74f',
+    #                     '4f0daa3bb2a5fa28286f1973deb9d13996cc73cc', 'bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f',
+    #                     '29159f1171c4930128ab0557836e856ce8cba6c8'],
+    #         'jgit': ['73a432514936fcee1386b37a0d60dcd913706bd1', 'e7142a3937825074ec68e4bacba30f9c962bd1e4',
+    #                     'df479df17676148bf6391401a704a7d7265c45fa', '399d2929ee0912bfeda8a4ef125f1b96bb7fd144',
+    #                     'f3b8653021830d8a503c5e7a9d33cb82b16db739', 'f2c58503d76be1dfb8072f6a7d592f88133708e1',
+    #                     '41b194c718d50763a79951029787cca70a5804a5', '1447159b926076c9222a96b3abbe17571953a74f',
+    #                     '4f0daa3bb2a5fa28286f1973deb9d13996cc73cc', 'bf32c9102fb1b5fdfa7a26a120b5d9a6b428dd2f',
+    #                     '29159f1171c4930128ab0557836e856ce8cba6c8'],
+    #            }
 
     # jgit_all = []
     # for project_name in projects:
     #     jgit_all.append(join_jgit_dataset(project_name, commits[project_name]))
     # print(jgit_all['project_name'].unique())
 
-    projects = ['commons-bcel', 'commons-text', 'easymock', 'jgit', 'openfire']
-    # projects = ['jgit']
-    # trace_file = '../dynamic_metrics/results/' + project_name + '-performance-diff.csv'
-    # trace_type = 'diff'
+    # projects = ['commons-bcel', 'commons-text', 'easymock', 'jgit', 'Openfire']
+    projects = ['jgit']
+    trace_type = 'median' #'avg' #'diff'
 
     for project_name in projects:
-        trace_file = '../dynamic_metrics/results/' + project_name + '-class-performance-avg.csv'
-        trace_type = 'avg'
-        ck_ownduration_correlation(project_name, trace_file, trace_type)
-        # und_ownduration_correlation(project_name)
+        # trace_file = '../dynamic_metrics/results/' + project_name + '-performance-diff.csv'
+        # trace_type = 'diff'
+        if trace_type == 'diff':
+            trace_file = '../dynamic_metrics/results/' + project_name + '-class-performance-diff.csv'
+        else:
+            trace_file = '../dynamic_metrics/results/' + project_name + '-class-performance-avg.csv'
+
+        ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
+        # ck_ownduration_correlation(project_name, trace_file, trace_type, ck_file)
+        und_ownduration_correlation(project_name, )
         # evo_ownduration_correlation(project_name)
         # cd_ownduration_correlation(project_name)
+
+    print('end')
