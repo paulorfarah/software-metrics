@@ -8,8 +8,7 @@ from scipy.stats import ttest_ind
 
 pd.set_option('display.max_columns', None)
 
-projects = ['commons-bcel', 'commons-csv', 'commons-text', 'easymock', 'jgit', 'openfire']
-# projects = ['jgit']
+
 
 # val_cols = ['commit_hash', 'class_name', 'method_name', 'own_duration', 'cumulative_duration', 'active',
 #             'available', 'buffers', 'cached ', 'child_major_faults', 'child_minor_faults', 'commit_limit',
@@ -67,7 +66,7 @@ def own_duration_avg_by_class(project_name, file, versions):
     res = pd.merge(res, mean, on=['commit_hash', 'class_name'])
     res = pd.merge(res, median, on=['commit_hash', 'class_name'])
     res = pd.merge(res, stddev, on=['commit_hash', 'class_name'])
-    res['performance_changed'] = 0
+    # res['perf_changed'] = 0
     #calculates if median of one instance is greater than median of all
     df_median_by_commit = df.groupby(['commit_hash'])['own_duration_avg'].median()#.reset_index(name='median_by_commit')
 
@@ -80,7 +79,8 @@ def own_duration_avg_by_class(project_name, file, versions):
 
     res['perf_changed'] = res.apply(lambda x: calculate_perf_change(x.commit_hash, x.median_val, medianDurations), axis=1)
 
-    res.to_csv('results/' + project_name + '-class-performance-avg.csv', index=False)
+    res.to_csv('results/' + project_name + '/' + project_name + '-class-performance-avg.csv', index=False)
+    res.loc[res['perf_changed'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv', index=False)
 
 def student_ttest_by_class(project_name, file, versions):
     # https://analyticsindiamag.com/a-beginners-guide-to-students-t-test-in-python-from-scratch%EF%BF%BC/
@@ -88,7 +88,7 @@ def student_ttest_by_class(project_name, file, versions):
 
     df = read_csv(file)
     df_res = pd.DataFrame(pd.np.empty((0, 10)))
-    df_res.columns = ['commit', 'prevcommit', 'class_name', 'metric', 'stat', 'pvalue', 'avg1', 'avg2',
+    df_res.columns = ['commit_hash', 'prevcommit', 'class_name', 'metric', 'stat', 'pvalue', 'mean_val', 'avg2',
                       'change', 'perf_change']
     # df_res.columns = ['committer_date', 'commit_hash', 'class_name', 'own_duration_avg']
 
@@ -175,7 +175,8 @@ def student_ttest_by_class(project_name, file, versions):
                                              pvalue, avg1, avg2, change, perf_change]
             print([versions[v1], versions[v2], class_name, metric, stat,
                                              pvalue, avg1, avg2, change, perf_change])
-    df_res.to_csv('results/' + project_name + '-class-performance-diff2.csv', index=False)
+    df_res.to_csv('results/' + project_name + '/' + project_name + '-class-performance-diff_all.csv', index=False)
+    df_res.loc[df_res['perf_change'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-diff_filtered.csv', index=False)
 
 
 def student_ttest_by_method(project_name, file, versions):
@@ -250,7 +251,6 @@ def student_ttest_by_method(project_name, file, versions):
 
 def main():
     print('starting...')
-    # bcel:
     commits = {'commons-bcel': ['a9c13ede0e565fae0593c1fde3b774d93abf3f71', 'bebe70de81f2f8912857ddb33e82d3ccc146a24e',
                     'bbaf623d750f030d186ed026dc201995145c63ec', 'fa271c5d7ed94dd1d9ef31c52f32d1746d5636dc',
                     'dce57b377d1ad6711ff613639303683e90f7bcc8', '9174edf0d530540c9f6df76b4d786c5a6ad78a5d',
@@ -313,10 +313,11 @@ def main():
     #
 
     # file = 'C:\\Users\\paulo\\ufpr\\datasets\\software-metrics\\resources\\resources-csv-1.csv'
-
+    # projects = ['commons-bcel', 'commons-csv', 'commons-text', 'easymock', 'jgit', 'openfire']
+    projects = ['Openfire']
     for project_name in projects:
         # file = 'C:\\Users\\paulo\\ufpr\\datasets\\' + project_name + '\\own_dur_trace-all.csv'
-        file = '../dynamic_metrics/results/' + project_name + '/own_dur_trace-all.csv'
+        file = '../dynamic_metrics/data/' + project_name + '/own_dur_trace-all.csv'
         commits_list = commits[project_name]
 
         # student_ttest_by_class(project_name, file, commits_list)

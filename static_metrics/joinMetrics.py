@@ -35,7 +35,7 @@ def parse_ck_results(file_path, project_name):
         #            'IntensiveCoupling', 'ShotgunSurgery', 'BrainMethod',
         #            'TotalMethod', 'TotalClassMethod', 'DiversityTotal',
         #            'DiversityMethod', 'DiversityClass']
-        df_all = pd.read_csv('../results/ck/ck_all.csv')  # , dtype={"user_id": int, "username": "string"})
+        df_all = pd.read_csv('../results/ck/ck_all2.csv')  # , dtype={"user_id": int, "username": "string"})
 
     except:
         print('Error reading ck_all.csv file: ' + str(sys.exc_info()))
@@ -46,16 +46,18 @@ def parse_ck_results(file_path, project_name):
         hash = hash.replace('_class', '')
         # print(hash)
         df1 = pd.read_csv(file)
-        df2 = pd.read_csv(file[:-10] + '_method.csv')
-        # df_temp = df1.append(df2)
-        df_temp = pd.merge(df1, df2, on=['file', 'class'], how='left').reset_index()
-        df_temp['commit_hash'] = hash
-        df_temp['project_name'] = project_name
-        # df_temp.to_csv(file[:-10] + '.csv')
-        df_all = df_all.append(df_temp)
+        df1['commit_hash'] = hash
+        df1['project_name'] = project_name
+        df_all = df_all.append(df1)
+        #Include methods
+        # df2 = pd.read_csv(file[:-10] + '_method.csv')
+        # df_temp = pd.merge(df1, df2, on=['file', 'class'], how='left').reset_index()
+        # df_temp['commit_hash'] = hash
+        # df_temp['project_name'] = project_name
+        # df_all = df_all.append(df_temp)
 
-    df_all = df_all.rename(columns={'oldName2': 'newName2'})
-    df_all.to_csv('results/ck/ck_all.csv', index=False)
+    # df_all = df_all.rename(columns={'oldName2': 'newName2'})
+    df_all.to_csv('results/ck/ck_all2.csv', index=False)
 
 
 def parse_understand_results(file_path, project_name):
@@ -411,15 +413,15 @@ if __name__ == "__main__":
     result_df = pd.DataFrame()
     for project_name in projects:
         print(project_name)
-        # # ck
-        # # file, class, commit_hash, project_name
-        # path = 'results/ck/' + project_name + '/'
-        # parse_ck_results(path, project_name)
+        # ck
+        # file, class, commit_hash, project_name
+        path = 'results/ck/' + project_name + '/'
+        parse_ck_results(path, project_name)
 
-        # understand
-        # Kind, Name, File
-        path = 'results/und/' + project_name + '/'
-        parse_understand_results(path, project_name)
+        # # understand
+        # # Kind, Name, File
+        # path = 'results/und/' + project_name + '/'
+        # parse_understand_results(path, project_name)
 
     # # refactoring miner
     # path = 'results/refactoring/' + project_name + '-results-refactoring-metrics.csv'
