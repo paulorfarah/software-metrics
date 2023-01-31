@@ -66,21 +66,22 @@ def own_duration_avg_by_class(project_name, file, versions):
     res = pd.merge(res, mean, on=['commit_hash', 'class_name'])
     res = pd.merge(res, median, on=['commit_hash', 'class_name'])
     res = pd.merge(res, stddev, on=['commit_hash', 'class_name'])
+
+
     # res['perf_changed'] = 0
-    #calculates if median of one instance is greater than median of all
-    df_median_by_commit = df.groupby(['commit_hash'])['own_duration_avg'].median()#.reset_index(name='median_by_commit')
-
-    medianDurations = {}
-    for commit, commit_median in df_median_by_commit.iteritems():
-        print(commit + ': ' + str(commit_median))
-        df_commit = df.loc[df['commit_hash'] == commit]
-        medianDurations[commit] = df_commit['own_duration_avg'].median()
-        # res.loc[res['commit_hash'] == commit]['performance_changed'] = np.where(res['median'] > medianDurations[commit], 1, 0)
-
-    res['perf_changed'] = res.apply(lambda x: calculate_perf_change(x.commit_hash, x.median_val, medianDurations), axis=1)
+    # #calculates if median of one instance is greater than median of all
+    # df_median_by_commit = df.groupby(['commit_hash'])['own_duration_avg'].median()#.reset_index(name='median_by_commit')
+    #
+    # medianDurations = {}
+    # for commit, commit_median in df_median_by_commit.iteritems():
+    #     print(commit + ': ' + str(commit_median))
+    #     df_commit = df.loc[df['commit_hash'] == commit]
+    #     medianDurations[commit] = df_commit['own_duration_avg'].median()
+    #     # res.loc[res['commit_hash'] == commit]['performance_changed'] = np.where(res['median'] > medianDurations[commit], 1, 0)
+    # res['perf_changed'] = res.apply(lambda x: calculate_perf_change(x.commit_hash, x.median_val, medianDurations), axis=1)
+    # res.loc[res['perf_changed'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv', index=False)
 
     res.to_csv('results/' + project_name + '/' + project_name + '-class-performance-avg.csv', index=False)
-    res.loc[res['perf_changed'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv', index=False)
 
 def student_ttest_by_class(project_name, file, versions):
     # https://analyticsindiamag.com/a-beginners-guide-to-students-t-test-in-python-from-scratch%EF%BF%BC/
@@ -167,18 +168,41 @@ def student_ttest_by_class(project_name, file, versions):
                 print('vals2: ', vals2)
 
             try:
-                change = round(((abs(avg2 - avg1) / avg1) * 100), 2)
+                change = round(((avg2 - avg1) / avg1 * 100), 2)
+                # change = 100 * abs((avg1 - avg2) / ((avg1+avg2)/2))
             except ZeroDivisionError:
                 print('ZeroDivisionError4: ', avg1)
-                change = 100
+                change = 0
             df_res.loc[len(df_res.index)] = [versions[v1], versions[v2], class_name, metric, stat,
                                              pvalue, avg1, avg2, change, perf_change]
-            print([versions[v1], versions[v2], class_name, metric, stat,
-                                             pvalue, avg1, avg2, change, perf_change])
+            # print([versions[v1], versions[v2], class_name, metric, stat,
+            #                                  pvalue, avg1, avg2, change, perf_change])
+
+    #delete avg with zero value
+    df_res.drop(df_res.index[df_res['mean_val'] == 0], inplace=True)
+    df_res.drop(df_res.index[df_res['avg2'] == 0], inplace=True)
+    df_res['change_abs'] = df_res['change'].abs()
+    df_median_by_commit = df_res.groupby(['commit_hash'])['change_abs'].median()
+    print(df_median_by_commit.head)
+    medianDurations = {}
+    for commit, commit_median in df_median_by_commit.iteritems():
+        print(commit + ': ' + str(commit_median))
+        df_commit = df_res.loc[df['commit_hash'] == commit]
+        medianDurations[commit] = df_commit['change_abs'].median()
+    df_res['changed_median'] = df_res.apply(
+        lambda x: calculate_perf_change(x.commit_hash, abs(x.change), medianDurations), axis=1)
+
     df_res.to_csv('results/' + project_name + '/' + project_name + '-class-performance-diff_all.csv', index=False)
     df_res.loc[df_res['perf_change'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-diff_filtered.csv', index=False)
+    df_res.loc[df_res['changed_median'] == 1].to_csv('results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv', index=False)
 
-
+# 3aecd517ad0ac4c83828a5f89b6b062acb6f4f6a: 0.16
+# 9174edf0d530540c9f6df76b4d786c5a6ad78a5d: -0.02
+# a9c13ede0e565fae0593c1fde3b774d93abf3f71: -4.15
+# bbaf623d750f030d186ed026dc201995145c63ec: -0.16
+# bebe70de81f2f8912857ddb33e82d3ccc146a24e: -0.15000000000000002
+# dce57b377d1ad6711ff613639303683e90f7bcc8: -0.37
+# fa271c5d7ed94dd1d9ef31c52f32d1746d5636dc: 1.65
 def student_ttest_by_method(project_name, file, versions):
     df = read_csv(file)
     df_res = pd.DataFrame(pd.np.empty((0, 9)))
@@ -313,14 +337,14 @@ def main():
     #
 
     # file = 'C:\\Users\\paulo\\ufpr\\datasets\\software-metrics\\resources\\resources-csv-1.csv'
-    # projects = ['commons-bcel', 'commons-csv', 'commons-text', 'easymock', 'jgit', 'openfire']
-    projects = ['Openfire']
+    projects = ['commons-bcel', 'commons-csv', 'commons-text', 'easymock', 'jgit', 'Openfire']
+    # projects = ['commons-bcel']
     for project_name in projects:
         # file = 'C:\\Users\\paulo\\ufpr\\datasets\\' + project_name + '\\own_dur_trace-all.csv'
         file = '../dynamic_metrics/data/' + project_name + '/own_dur_trace-all.csv'
         commits_list = commits[project_name]
 
-        # student_ttest_by_class(project_name, file, commits_list)
+        student_ttest_by_class(project_name, file, commits_list)
         # student_ttest_by_method(project_name, file, commits_list)
         own_duration_avg_by_class(project_name, file, commits_list)
 

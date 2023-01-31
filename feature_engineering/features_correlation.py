@@ -15,15 +15,15 @@ def ck_ownduration_correlation(project_name, file, ck_file, ttype, output):
     df_pd = pd.read_csv(file, sep=',')
     df_pd['project_name'] = project_name
     if ttype == 'diff' or ttype == 'avg':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
                                    class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'mean_val']].rename(
-            columns={'commit': 'commit_hash', 'mean_val': 'own_duration'}), how='outer')
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
     elif ttype == 'median':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'median_val']].rename(
-            columns={'commit': 'commit_hash', 'median_val': 'own_duration'}), how='outer')
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
         df = df.loc[df['perf_changed'] == 1]
 
 
@@ -129,15 +129,15 @@ def und_ownduration_correlation(project_name, file, ttype, output):
 
 
     if ttype == 'diff' or ttype == 'avg':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
                                    class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'mean_val']].rename(
-            columns={'commit': 'commit_hash', 'mean_val': 'own_duration'}), how='outer')
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
     elif ttype == 'median':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'median_val']].rename(
-            columns={'commit': 'commit_hash', 'median_val': 'own_duration'}), how='outer')
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
         df = df.loc[df['perf_changed'] == 1]
 
 
@@ -251,15 +251,15 @@ def evo_ownduration_correlation(project_name, file, ttype, output):
     #     df = df.loc[df['perf_changed'] == 1]
 
     if ttype == 'diff' or ttype == 'avg':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
                                    class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'mean_val']].rename(
-            columns={'commit': 'commit_hash', 'mean_val': 'own_duration'}), how='outer')
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
     elif ttype == 'median':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'median_val']].rename(
-            columns={'commit': 'commit_hash', 'median_val': 'own_duration'}), how='outer')
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
         df = df.loc[df['perf_changed'] == 1]
 
     # evolutionary metrics
@@ -322,15 +322,15 @@ def cd_ownduration_correlation(project_name, file, ttype, output):
     #     df = df.loc[df['perf_changed'] == 1]
 
     if ttype == 'diff' or ttype == 'avg':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
                                    class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'mean_val']].rename(
-            columns={'commit': 'commit_hash', 'mean_val': 'own_duration'}), how='outer')
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
     elif ttype == 'median':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['median_val'], perf_changed=df_pd['perf_changed'])
-        df = df.merge(df_pd[['project_name', 'commit', 'class_name', 'median_val']].rename(
-            columns={'commit': 'commit_hash', 'median_val': 'own_duration'}), how='outer')
+        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
+        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+            columns={'mean_val': 'own_duration'}), how='outer')
         df = df.loc[df['perf_changed'] == 1]
 
     changedistiller_metrics = ["PROJECT_NAME", "CURRENT_COMMIT", "PREVIOUS_COMMIT", "CLASS_CURRENTCOMMIT",
@@ -619,8 +619,7 @@ def cd_ownduration_correlation(project_name, file, ttype, output):
 
 if __name__ == "__main__":
 
-
-    projects = ['commons-bcel', 'commons-text', 'easymock', 'jgit', 'Openfire']
+    projects = ['commons-text', 'easymock', 'jgit', 'Openfire']
     # projects = ['commons-bcel']
     for project_name in projects:
         # all instances using avg
