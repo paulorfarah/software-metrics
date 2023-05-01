@@ -8,28 +8,46 @@ from numpy import percentile
 pd.set_option('display.max_columns', None)
 
 
-def ck_ownduration_correlation(project_name, file, ck_file, ttype, output):
+def ck_ownduration_correlation(project_name, file, ck_file, ttype, output, method=False):
     print(project_name + ' ck')
 
     # read trace own duration metric
     df_pd = pd.read_csv(file, sep=',')
     df_pd['project_name'] = project_name
+    df_pd['short_method_name_aux'] = df_pd['method_name'].str.split('(').str[0]
+    df_pd['short_method_name'] = df_pd['short_method_name_aux'].str.split('.').str[-1]
+
     if ttype == 'diff' or ttype == 'avg':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
-        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
-            columns={'mean_val': 'own_duration'}), how='outer')
+        if method:
+            df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                       class_name=df_pd['class_name'], method_name=df_pd['method_name'], short_method_name=df_pd['short_method_name'], own_duration=df_pd['mean_val'])
+            df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'method_name', 'mean_val']].rename(
+                columns={'mean_val': 'own_duration'}), how='outer')
+        else:
+            df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                       class_name=df_pd['class_name'], own_duration=df_pd['mean_val'])
+            df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+                columns={'mean_val': 'own_duration'}), how='outer')
     elif ttype == 'median':
-        df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
-                                   class_name=df_pd['class_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
-        df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
-            columns={'mean_val': 'own_duration'}), how='outer')
-        df = df.loc[df['perf_changed'] == 1]
+        if method:
+            df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                       class_name=df_pd['class_name'], method_name=df_pd['method_name'], short_method_name=df_pd['short_method_name'], own_duration=df_pd['mean_val'], perf_changed=df_pd['changed_median'])
+            df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'method_name', 'mean_val']].rename(
+                columns={'mean_val': 'own_duration'}), how='outer')
+            df = df.loc[df['perf_changed'] == 1]
+        else:
+            df = pd.DataFrame().assign(project_name=df_pd['project_name'], commit_hash=df_pd['commit_hash'],
+                                       class_name=df_pd['class_name'], own_duration=df_pd['mean_val'],
+                                       perf_changed=df_pd['changed_median'])
+            df = df.merge(df_pd[['project_name', 'commit_hash', 'class_name', 'mean_val']].rename(
+                columns={'mean_val': 'own_duration'}), how='outer')
+            df = df.loc[df['perf_changed'] == 1]
 
 
     #read static ck metrics
 
-    ck_metrics_class_and_methods = ['index', 'file', 'class', 'type', 'cbo_x', 'cboModified_x', 'fanin_x', 'fanout_x', 'wmc_x', 'dit',
+    ck_metrics_class_and_methods = ['index', 'file', 'class', 'type', 'cbo_x', 'cboModified_x', 'fanin_x', 'fanout_x',
+                                    'wmc_x', 'dit',
                   'noc', 'rfc_x', 'lcom', 'lcom*', 'tcc', 'lcc', 'totalMethodsQty', 'staticMethodsQty',
                   'publicMethodsQty', 'privateMethodsQty', 'protectedMethodsQty', 'defaultMethodsQty',
                   'visibleMethodsQty', 'abstractMethodsQty', 'finalMethodsQty', 'synchronizedMethodsQty',
@@ -61,6 +79,9 @@ def ck_ownduration_correlation(project_name, file, ck_file, ttype, output):
                         index_col=False)
 
     df_ck = df_ck[df_ck['project_name'] == project_name]
+    df_ck['short_method_name'] = df_ck['method'].str.split('/').str[0]
+    # df_pd['short_method_name'] = df_pd['short_method_name_aux'].str.split('.').str[-1]
+
     if project_name == 'jgit':
         path1 = '/mnt/sda4/software-metrics/static_metrics/' + project_name + '/'
     else:
@@ -75,8 +96,12 @@ def ck_ownduration_correlation(project_name, file, ck_file, ttype, output):
     #except:
     #    pass
 
-    df = pd.merge(left=df, right=df_ck, left_on=['project_name', 'commit_hash', 'class_name'],
-                  right_on=['project_name', 'commit_hash', 'file'], how='left')
+    if method:
+        df = pd.merge(left=df, right=df_ck, left_on=['project_name', 'commit_hash', 'class_name', 'short_method_name'],
+                  right_on=['project_name', 'commit_hash', 'file', 'short_method_name'], how='left')
+    else:
+        df = pd.merge(left=df, right=df_ck, left_on=['project_name', 'commit_hash', 'class_name'],
+                      right_on=['project_name', 'commit_hash', 'file'], how='left')
 
     #plot correlations
     metrics = ['own_duration'] + ck_metrics_class_and_methods[4:52] + ck_metrics_class_and_methods[55:83]
@@ -105,6 +130,8 @@ def ck_ownduration_correlation(project_name, file, ck_file, ttype, output):
     # df_outliers[['own_duration', 'synchronizedMethodsQty']].corr().to_csv('results/corr.csv')
 
 
+    if method:
+        output = output.replace('.csv', '_method.csv')
     df[metrics].corr().to_csv(output, index=False)
     df_outliers[metrics].corr().to_csv(output.replace('.csv', '_outliers.csv'), index=False)
     return df[metrics].corr()
@@ -619,52 +646,80 @@ def cd_ownduration_correlation(project_name, file, ttype, output):
 
 if __name__ == "__main__":
 
-    projects = ['commons-text', 'easymock', 'jgit', 'Openfire']
-    # projects = ['commons-bcel']
+    projects = ['commons-csv', 'easymock', 'jgit', 'Openfire']
+    # projects = ['commons-text', 'commons-bcel']
     for project_name in projects:
         # all instances using avg
-        trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-avg.csv'
-
-        # 1) ck avg
-        output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_avg.csv'
-        ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
-        ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'avg', output)
-
-        # 2) und avg
-        output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_avg.csv'
-        und_cor = und_ownduration_correlation(project_name, trace_file, 'avg', output)
-
-        # 3) evo avg
-        output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_avg.csv'
-        evo_cor = evo_ownduration_correlation(project_name, trace_file, 'avg', output)
-
-        # 4) change distiller avg
-        output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_avg.csv'
-        cd_cor = cd_ownduration_correlation(project_name, trace_file, 'avg', output)
+        # trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-avg.csv'
+        #
+        # # 1) ck avg
+        # output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_avg.csv'
+        # ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
+        # ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'avg', output)
+        #
+        # # 2) und avg
+        # output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_avg.csv'
+        # und_cor = und_ownduration_correlation(project_name, trace_file, 'avg', output)
+        #
+        # # 3) evo avg
+        # output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_avg.csv'
+        # evo_cor = evo_ownduration_correlation(project_name, trace_file, 'avg', output)
+        #
+        # # 4) change distiller avg
+        # output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_avg.csv'
+        # cd_cor = cd_ownduration_correlation(project_name, trace_file, 'avg', output)
         #
         #
-        # # mean value greater than the median of the commit to be considered a performance change
-        trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv'
+        # class
+        # mean value greater than the median of the commit to be considered a performance change
+        # trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-median_filtered.csv'
+        # ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
+        # output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_median.csv'
+        # ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'median', output)
+        # output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_median.csv'
+        # und_cor = und_ownduration_correlation(project_name, trace_file, 'median', output)
+        # output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_median.csv'
+        # evo_cor = evo_ownduration_correlation(project_name, trace_file, 'median', output)
+        # output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_median.csv'
+        # cd_cor = cd_ownduration_correlation(project_name, trace_file, 'median', output)
+
+        # method
+        # mean value greater than the median of the commit to be considered a performance change
+        trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-method-performance-median_filtered.csv'
         ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
-        output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_median.csv'
-        ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'median', output)
-        output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_median.csv'
-        und_cor = und_ownduration_correlation(project_name, trace_file, 'median', output)
-        output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_median.csv'
-        evo_cor = evo_ownduration_correlation(project_name, trace_file, 'median', output)
-        output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_median.csv'
-        cd_cor = cd_ownduration_correlation(project_name, trace_file, 'median', output)
+        output = 'results/correlation/ck/' + project_name + '/' + project_name + '-method_ck_correlation_median.csv'
+        ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'median', output, True)
+        # output = 'results/correlation/und/' + project_name + '/' + project_name + '-method_und_correlation_median.csv'
+        # und_cor = und_ownduration_correlation(project_name, trace_file, 'median', output)
+        # output = 'results/correlation/evo/' + project_name + '/' + project_name + '-method_evo_correlation_median.csv'
+        # evo_cor = evo_ownduration_correlation(project_name, trace_file, 'median', output)
+        # output = 'results/correlation/cd/' + project_name + '/' + project_name + '-method_cd_correlation_median.csv'
+        # cd_cor = cd_ownduration_correlation(project_name, trace_file, 'median', output)
         #
-        # # t-student statistical significance to be considered a performance change
-        trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-diff_filtered.csv'
+        # class
+        # t-student statistical significance to be considered a performance change
+        # trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-class-performance-diff_filtered.csv'
+        # ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
+        # output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_diff.csv'
+        # ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'diff', output)
+        # output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_diff.csv'
+        # und_cor = und_ownduration_correlation(project_name, trace_file, 'diff', output)
+        # output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_diff.csv'
+        # evo_cor = evo_ownduration_correlation(project_name, trace_file, 'diff', output)
+        # output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_diff.csv'
+        # cd_cor = cd_ownduration_correlation(project_name, trace_file, 'diff', output)
+
+        # method
+        # t-student statistical significance to be considered a performance change
+        trace_file = '../dynamic_metrics/results/' + project_name + '/' + project_name + '-method-performance-diff_filtered.csv'
         ck_file = '../static_metrics/results/ck/' + project_name + 'ck_2.csv'
-        output = 'results/correlation/ck/' + project_name + '/' + project_name + '_ck_correlation_diff.csv'
-        ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'diff', output)
-        output = 'results/correlation/und/' + project_name + '/' + project_name + '_und_correlation_diff.csv'
-        und_cor = und_ownduration_correlation(project_name, trace_file, 'diff', output)
-        output = 'results/correlation/evo/' + project_name + '/' + project_name + 'evo_correlation_diff.csv'
-        evo_cor = evo_ownduration_correlation(project_name, trace_file, 'diff', output)
-        output = 'results/correlation/cd/' + project_name + '/' + project_name + '_cd_correlation_diff.csv'
-        cd_cor = cd_ownduration_correlation(project_name, trace_file, 'diff', output)
+        output = 'results/correlation/ck/' + project_name + '/' + project_name + '-method_ck_correlation_diff.csv'
+        ck_cor = ck_ownduration_correlation(project_name, trace_file, ck_file, 'diff', output, True)
+        # output = 'results/correlation/und/' + project_name + '/' + project_name + '-method_und_correlation_diff.csv'
+        # und_cor = und_ownduration_correlation(project_name, trace_file, 'diff', output)
+        # output = 'results/correlation/evo/' + project_name + '/' + project_name + '-method_evo_correlation_diff.csv'
+        # evo_cor = evo_ownduration_correlation(project_name, trace_file, 'diff', output)
+        # output = 'results/correlation/cd/' + project_name + '/' + project_name + '-method_cd_correlation_diff.csv'
+        # cd_cor = cd_ownduration_correlation(project_name, trace_file, 'diff', output)
 
     print('end')
